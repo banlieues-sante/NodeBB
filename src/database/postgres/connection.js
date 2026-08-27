@@ -21,6 +21,12 @@ connection.getConnectionOptions = function (postgres) {
 		winston.warn('You have no database name, using "nodebb"');
 		postgres.database = 'nodebb';
 	}
+	if (!postgres.schema) {
+		postgres.schema = 'public';
+	}
+	if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(postgres.schema)) {
+		throw new Error(`Invalid postgres:schema value: ${postgres.schema}`);
+	}
 
 	const connOptions = {
 		host: postgres.host,
@@ -28,6 +34,8 @@ connection.getConnectionOptions = function (postgres) {
 		user: postgres.username,
 		password: postgres.password,
 		database: postgres.database,
+		schema: postgres.schema, // Not used by Postgres to set the schema, only there to be re-used elsewhere in the postgres adapter
+		options: `-c search_path=${postgres.schema}`, // Set the schema to use, redundant with the onConnect callback but not conflicting
 		ssl: String(postgres.ssl) === 'true',
 		max: 20,
 		connectionTimeoutMillis: 90000,
@@ -51,6 +59,9 @@ connection.getConnectionOptions = function (postgres) {
 connection.connect = async function (options) {
 	const { Pool } = require('pg');
 	const connOptions = connection.getConnectionOptions(options);
+	connOptions.onConnect = async (client) => {
+		await client.query(`SET search_path TO "${connOptions.schema}"`); // Set the search path for which schema to use on every new connection to the pool
+	};
 	const db = new Pool(connOptions);
 	await db.connect();
 	return db;
