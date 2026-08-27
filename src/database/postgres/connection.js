@@ -37,7 +37,7 @@ connection.getConnectionOptions = function (postgres) {
 		schema: postgres.schema, // Not used by Postgres to set the schema, only there to be re-used elsewhere in the postgres adapter
 		options: `-c search_path=${postgres.schema}`, // Set the schema to use, redundant with the onConnect callback but not conflicting
 		ssl: String(postgres.ssl) === 'true',
-		max: 20,
+		max: 2,
 		connectionTimeoutMillis: 90000,
 	};
 
