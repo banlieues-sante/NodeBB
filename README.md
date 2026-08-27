@@ -28,6 +28,11 @@ NODEBB_POSTGRES_DATABASE=DB_NAME
 NODEBB_POSTGRES_SCHEMA=DB_SCHEMA
 NODEBB_POSTGRES_SSL=ENABLE_SSL_CHECK
 NODEBB_POSTGRES_SSL_REJECT_UNAUTHORIZED=ENABLE_SSL_REJECT_UNAUTHORIZED
+
+# Default admin user
+NODEBB_ADMIN_USERNAME: ADMIN_USERNAME
+NODEBB_ADMIN_PASSWORD: ADMIN_PASSWORD
+NODEBB_ADMIN_EMAIL: ADMIN_EMAIL
 ```
 
 ### NodeBB Setup
@@ -40,14 +45,6 @@ Enter the docker container terminal:
 ```bash
 docker exec -it <container-name> sh
 ````
-
-Setup the admin user:
-```bash
-export admin__username="youradmin"
-export admin__password="a-strong-password"
-export admin__passwordConfirm="a-strong-password"
-export admin__email="your@email"
-```
 
 Run the setup wizard:
 ```bash

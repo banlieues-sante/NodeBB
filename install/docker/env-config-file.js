@@ -41,6 +41,13 @@ if (bool(env.NODEBB_POSTGRES_SSL)) {
 	};
 }
 
+if (env.NODEBB_ADMIN_USERNAME) {
+	config['admin:username'] = required('NODEBB_ADMIN_USERNAME');
+	config['admin:password'] = required('NODEBB_ADMIN_PASSWORD');
+	config['admin:password:confirm'] = required('NODEBB_ADMIN_PASSWORD');
+	config['admin:email'] = required('NODEBB_ADMIN_EMAIL');
+}
+
 const outPath = env.NODEBB_CONFIG_PATH || '/opt/config/config.json';
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, JSON.stringify(config, null, 4));
