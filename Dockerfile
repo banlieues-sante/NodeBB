@@ -54,10 +54,12 @@ RUN corepack enable \
     && chown -R ${USER}:${USER} /usr/src/app/ /opt/config/
 
 COPY --from=build --chown=${USER}:${USER} /usr/src/app/ /usr/src/app/install/docker/setup.json /usr/src/app/
-COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/src/app/install/docker/entrypoint.sh /usr/local/bin/
+COPY --from=build --chown=${USER}:${USER} /usr/bin/tini /usr/src/app/install/docker/entrypoint.sh /usr/src/app/install/docker/docker-entrypoint-wrapper.sh /usr/local/bin/
+COPY --from=build --chown=${USER}:${USER} /usr/src/app/install/docker/env-config-file.js /usr/src/app/install/docker/env-config-file.js
 
 RUN chmod +x /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/tini
+    && chmod +x /usr/local/bin/tini \
+    && chmod +x /usr/local/bin/docker-entrypoint-wrapper.sh
 
 # TODO: Have docker-compose use environment variables to create files like setup.json and config.json.
 # COPY --from=hairyhenderson/gomplate:stable /gomplate /usr/local/bin/gomplate
@@ -73,4 +75,4 @@ VOLUME ["/usr/src/app/node_modules", "/usr/src/app/build", "/usr/src/app/public/
 # This approach is crucial to circumvent issues with unmanaged subprocesses and signal handling in containerised environments.
 # By integrating tini, we enhance the reliability and stability of our Docker containers.
 # Ensures smooth start-up and shutdown processes, and reliable, safe handling of signal processing.
-ENTRYPOINT ["tini", "--", "entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "docker-entrypoint-wrapper.sh"]

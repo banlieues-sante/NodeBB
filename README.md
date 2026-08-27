@@ -86,6 +86,25 @@ This will start NodeBB along with required services at: ```` http://localhost:45
 
 **For more details, see: https://docs.nodebb.org**
 
+###  Environment Variables for docker-compose
+
+```dotenv
+NODEBB_URL=YOUR_SITE_PUBLIC_URL
+NODEBB_SECRET=RANDOM_STRING
+NODEBB_DATABASE=DATABASE_TYPE
+NODEBB_PORT=EXPOSED_PORT
+
+# Postgres Config
+NODEBB_POSTGRES_HOST=HOST
+NODEBB_POSTGRES_PORT=PORT
+NODEBB_POSTGRES_USERNAME=DB_USERNAME
+NODEBB_POSTGRES_PASSWORD=DB_PASSWORD
+NODEBB_POSTGRES_DATABASE=DB_NAME
+NODEBB_POSTGRES_SCHEMA=DB_SCHEMA
+NODEBB_POSTGRES_SSL=ENABLE_SSL_CHECK
+NODEBB_POSTGRES_SSL_REJECT_UNAUTHORIZED=DISABLE_SSL_CHECK_FOR_UNAUTHORIZED_CERTS
+```
+
 ## Securing NodeBB
 
 It is important to ensure that your NodeBB and database servers are secured. Bear these points in mind:
