@@ -24,6 +24,7 @@ const config = {
 	secret: required('NODEBB_SECRET'),
 	database: env.NODEBB_DATABASE || 'postgres',
 	port: parseInt(env.NODEBB_PORT || '4567', 10),
+	trust_proxy: true,
 	postgres: {
 		host: required('NODEBB_POSTGRES_HOST'),
 		port: parseInt(env.NODEBB_POSTGRES_PORT || '5432', 10),
