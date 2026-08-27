@@ -21,10 +21,6 @@ services:
       NODEBB_POSTGRES_SCHEMA: ${NODEBB_POSTGRES_SCHEMA}
       NODEBB_POSTGRES_SSL: ${NODEBB_POSTGRES_SSL}
       NODEBB_POSTGRES_SSL_REJECT_UNAUTHORIZED: ${NODEBB_POSTGRES_SSL_REJECT_UNAUTHORIZED}
-      admin_username: ${admin_username}
-      admin_password: ${admin_password}
-      admin_password_confirm: ${admin_password_confirm}
-      admin_email: ${admin_email}
 
 volumes:
   nodebb-build:
