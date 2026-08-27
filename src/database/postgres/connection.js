@@ -22,7 +22,7 @@ connection.getConnectionOptions = function (postgres) {
 		postgres.database = 'nodebb';
 	}
 	if (!postgres.schema) {
-		postgres.schema = nconf.get('postgres:schema') || 'public';
+		postgres.schema = process.env.NODEBB_POSTGRES_SCHEMA || 'public';
 	}
 	if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(postgres.schema)) {
 		throw new Error(`Invalid postgres:schema value: ${postgres.schema}`);
