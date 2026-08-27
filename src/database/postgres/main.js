@@ -6,8 +6,9 @@ module.exports = function (module) {
 	const dbHelpers = require('../helpers');
 
 	module.flushdb = async function () {
-		await module.pool.query(`DROP SCHEMA "public" CASCADE`);
-		await module.pool.query(`CREATE SCHEMA "public"`);
+		const schema = module.schema || 'public';
+		await module.pool.query(`DROP SCHEMA "${schema}" CASCADE`);
+		await module.pool.query(`CREATE SCHEMA "${schema}"`);
 	};
 
 	module.emptydb = async function () {

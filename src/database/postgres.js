@@ -40,6 +40,11 @@ postgresModule.questions = [
 		default: nconf.get('postgres:database') || nconf.get('defaults:postgres:database') || 'nodebb',
 	},
 	{
+		name: 'postgres:schema',
+		description: 'PostgreSQL schema to use (default: public)',
+		default: nconf.get('postgres:schema') || nconf.get('defaults:postgres:schema') || 'public',
+	},
+	{
 		name: 'postgres:ssl',
 		description: 'Enable SSL for PostgreSQL database access',
 		default: nconf.get('postgres:ssl') || nconf.get('defaults:postgres:ssl') || false,
@@ -49,11 +54,16 @@ postgresModule.questions = [
 postgresModule.init = async function (opts) {
 	const { Pool } = require('pg');
 	const connOptions = connection.getConnectionOptions(opts);
+	connOptions.onConnect = async (client) => {
+		await client.query(`SET search_path TO "${connOptions.schema}"`); // Set the search path for which schema to use on every new connection to the pool
+	};
 	const pool = new Pool(connOptions);
 	postgresModule.pool = pool;
 	postgresModule.client = pool;
+	postgresModule.schema = connOptions.schema;
 	const client = await pool.connect();
 	try {
+		await assertSchemaExists(client, connOptions.schema);
 		await checkUpgrade(client);
 	} catch (err) {
 		winston.error(`NodeBB could not connect to your PostgreSQL database. PostgreSQL returned the following error: ${err.message}`);
@@ -63,26 +73,36 @@ postgresModule.init = async function (opts) {
 	}
 };
 
+async function assertSchemaExists(client, schema) {
+	const res = await client.query({
+		name: 'assertSchemaExists',
+		text: `SELECT EXISTS(SELECT 1 FROM "pg_catalog"."pg_namespace" WHERE "nspname" = $1) e`,
+		values: [schema],
+	});
+	if (!res.rows[0].e) {
+		throw new Error(`PostgreSQL schema "${schema}" does not exist. Create it before starting NodeBB — it will not be created automatically.`);
+	}
+}
 
-async function checkUpgrade(client) {
+async function checkUpgrade(client, schema) {
 	const res = await client.query(`
 SELECT EXISTS(SELECT *
                 FROM "information_schema"."columns"
-               WHERE "table_schema" = 'public'
+               WHERE "table_schema" = '${schema}'
                  AND "table_name" = 'objects'
                  AND "column_name" = 'data') a,
        EXISTS(SELECT *
                 FROM "information_schema"."columns"
-               WHERE "table_schema" = 'public'
+               WHERE "table_schema" = '${schema}'
                  AND "table_name" = 'legacy_hash'
                  AND "column_name" = '_key') b,
        EXISTS(SELECT *
                 FROM "information_schema"."routines"
-               WHERE "routine_schema" = 'public'
+               WHERE "routine_schema" = '${schema}'
                  AND "routine_name" = 'nodebb_get_sorted_set_members') c,
 		EXISTS(SELECT *
 				FROM "information_schema"."routines"
-			   WHERE "routine_schema" = 'public'
+			   WHERE "routine_schema" = '${schema}'
 				 AND "routine_name" = 'nodebb_get_sorted_set_members_withscores') d`);
 
 	if (res.rows[0].a && res.rows[0].b && res.rows[0].c && res.rows[0].d) {
