@@ -64,7 +64,7 @@ postgresModule.init = async function (opts) {
 	const client = await pool.connect();
 	try {
 		await assertSchemaExists(client, connOptions.schema);
-		await checkUpgrade(client);
+		await checkUpgrade(client, connOptions.schema);
 	} catch (err) {
 		winston.error(`NodeBB could not connect to your PostgreSQL database. PostgreSQL returned the following error: ${err.message}`);
 		throw err;
