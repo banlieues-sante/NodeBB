@@ -172,7 +172,8 @@ fi
 
 # --- Done --------------------------------------------------------------------
 
-PKG_VERSION="$(git show HEAD:package.json | grep -m1 '"version"' | sed -E 's/.*"version": *"([^"]+)".*/\1/')"
+PKG_VERSION="$(git show HEAD:install/package.json 2>/dev/null | grep -m1 '"version"' | sed -E 's/.*"version": *"([^"]+)".*/\1/' || true)"
+PKG_VERSION="${PKG_VERSION:-unknown}"
 
 echo
 info "Merged $TAG into '$TARGET_BRANCH' (package.json version: $PKG_VERSION)"
