@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# update-upstream.sh
+#
 # Merges a NodeBB upstream release tag into a deploy branch of this fork.
 #
 # Usage:
@@ -95,10 +97,18 @@ CURRENT_TAG="$(git describe --tags --abbrev=0 --match 'v[0-9]*' "$TARGET_BRANCH"
 
 info "'$TARGET_BRANCH' is currently based on NodeBB $CURRENT_TAG"
 
-# Stable tags newer than the current base (not already merged), newest first.
+# True if version $1 is strictly greater than version $2 (e.g. v4.16.5 > v4.16.4).
+version_gt() {
+	[ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n1)" = "$1" ]
+}
+
+# Stable tags with a higher version than the current base and not already
+# merged, newest first.
 CANDIDATES=()
 while IFS= read -r tag; do
 	[[ "$tag" =~ $STABLE_TAG_REGEX ]] || continue
+	# Tags are sorted newest first, so nothing after this point is newer.
+	version_gt "$tag" "$CURRENT_TAG" || break
 	if ! git merge-base --is-ancestor "$tag" "$TARGET_BRANCH"; then
 		CANDIDATES+=("$tag")
 	fi
@@ -131,7 +141,7 @@ TAG="${CANDIDATES[$((choice - 1))]}"
 UPSTREAM_COMMITS="$(git rev-list --count "$TARGET_BRANCH..$TAG")"
 
 # Files you changed relative to your base release vs files upstream changed
-# between your base release and the selected one.
+# between your base release and the selected one. Overlap = likely conflicts.
 OUR_FILES="$(git diff --name-only "$CURRENT_TAG" "$TARGET_BRANCH" | sort)"
 THEIR_FILES="$(git diff --name-only "$CURRENT_TAG" "$TAG" | sort)"
 OVERLAP="$(comm -12 <(printf '%s\n' "$OUR_FILES") <(printf '%s\n' "$THEIR_FILES") | sed '/^$/d')"
@@ -176,7 +186,7 @@ PKG_VERSION="$(git show HEAD:install/package.json 2>/dev/null | grep -m1 '"versi
 PKG_VERSION="${PKG_VERSION:-unknown}"
 
 echo
-info "Merged $TAG into '$TARGET_BRANCH' (package.json version: $PKG_VERSION)"
+info "Merged $TAG into '$TARGET_BRANCH' (install/package.json version: $PKG_VERSION)"
 if [ -n "$OVERLAP" ]; then
 	warn "The merge applied cleanly, but double-check the overlapping files listed above."
 fi
