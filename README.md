@@ -1,7 +1,19 @@
-# Docker Compose Installation
+# Banlieues Santé - Forum
+
+Forum **NodeBB** de la plateforme ambassadrice de Banlieues Santé. Légèrement modifié pour fonctionner avec les schémas Postgres.
+
+## Maintenance : Mettre à jour avec les nouvelles versions de NodeBB
+
+Utiliser le script `update-upstream.sh` qui permet de récupérer et merge le code de la dernière version 4.X publiée. Ensuite push le code sur la branche approprié.
+
+```bash
+./update-upstream.sh
+```
+
+## Docker Compose Installation
 
 ### Database
-- Create a postgres user witht he correct permissions.
+- Create a postgres user with the correct permissions.
 - Create the schema in the Postgres database and check the permissions.
 
 ### Dokploy
