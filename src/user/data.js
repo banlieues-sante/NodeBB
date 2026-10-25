@@ -28,7 +28,7 @@ const intFields = [
 module.exports = function (User) {
 	const fieldWhitelist = [
 		'uid', 'username', 'userslug', 'url', 'email', 'email:confirmed', 'joindate',
-		'lastonline', 'picture', 'icon:bgColor', 'fullname', 'birthday',
+		'lastonline', 'picture', 'icon:bgColor', 'fullname', 'fullnameEmoji', 'birthday',
 		'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation',
 		'postcount', 'topiccount', 'lastposttime', 'banned', 'banned:expire',
 		'status', 'flags', 'followerCount', 'followingCount', 'cover:url',
@@ -67,7 +67,7 @@ module.exports = function (User) {
 	let iconBackgrounds;
 
 	User.reloadCustomFieldWhitelist = async () => {
-		customFieldWhiteList = await db.getSortedSetRange('user-custom-fields', 0, -1);
+		customFieldWhiteList = await User.customFields.getKeys();
 	};
 
 	User.getUserFieldWhitelist = async function () {
@@ -272,6 +272,11 @@ module.exports = function (User) {
 
 			db.parseIntFields(user, intFields, requestedFields);
 
+			// Parse fullnameEmoji from JSON
+			if (user.hasOwnProperty('fullnameEmoji')) {
+				user.fullnameEmoji = user.fullnameEmoji ? JSON.parse(String(user.fullnameEmoji)) : [];
+			}
+
 			if (user.hasOwnProperty('username')) {
 				user.username = String(user.username || '');
 			}
@@ -305,7 +310,7 @@ module.exports = function (User) {
 					user.picture = user.uploadedpicture;
 				}
 			}
-
+			
 			if (user.hasOwnProperty('cover:url')) {
 				user['cover:url'] = user['cover:url'] ?
 					prependRelativePath(user['cover:url']) :
@@ -416,7 +421,10 @@ module.exports = function (User) {
 			relativeCandidate = relativeCandidate.slice(relative_path.length);
 		}
 		const normalizedPath = path.posix.normalize(relativeCandidate);
-		return normalizedPath === upload_url || normalizedPath.startsWith(`${upload_url}/`);
+		// old user profile images are stored as `/uploads/profile` instead of `/assets/uploads/profile`
+		const legacyUploadUrl = upload_url.replace(/^\/assets/, '');
+		return normalizedPath === upload_url || normalizedPath.startsWith(`${upload_url}/`) ||
+			normalizedPath === legacyUploadUrl || normalizedPath.startsWith(`${legacyUploadUrl}/`);
 	};
 
 

@@ -26,6 +26,7 @@ uploadsController.upload = async function (req, res, filesIterator) {
 		const images = [];
 		for (const fileObj of files) {
 			/* eslint-disable no-await-in-loop */
+			await validateFileExtension(fileObj);
 			images.push(await filesIterator(fileObj));
 		}
 
@@ -119,12 +120,12 @@ uploadsController.uploadThumb = async function (req, res) {
 	if (!meta.config.allowTopicsThumbnail) {
 		return helpers.formatApiResponse(503, res, new Error('[[error:topic-thumbnails-are-disabled]]'));
 	}
+	const canUpload = await privileges.global.can('upload:post:image', req.uid);
+	if (!canUpload) {
+		throw new Error('[[error:no-privileges]]');
+	}
 
 	return await uploadsController.upload(req, res, async (uploadedFile) => {
-		const canUpload = await privileges.global.can('upload:post:image', req.uid);
-		if (!canUpload) {
-			throw new Error('[[error:no-privileges]]');
-		}
 		const detected = await fileTypeFromFile(uploadedFile.path);
 		const isImage = detected && detected.mime.startsWith('image/');
 		if (!isImage) {
@@ -174,8 +175,6 @@ uploadsController.uploadFile = async function (uid, uploadedFile) {
 		throw new Error(`[[error:file-too-big, ${meta.config.maximumFileSize}]]`);
 	}
 
-	await validateFileExtension(uploadedFile);
-
 	return await saveFileToLocal(uid, 'files', uploadedFile);
 };
 
@@ -183,9 +182,10 @@ async function saveFileToLocal(uid, folder, uploadedFile) {
 	const name = uploadedFile.name || 'upload';
 	const extension = path.extname(name) || '';
 
-	const filename = `${Date.now()}-${name.slice(0, -extension.length).slice(0, 255)}${extension}`;
+	const basename = extension ? name.slice(0, -extension.length) : name;
+	const filename = `${Date.now()}-${basename.slice(0, 255)}${extension}`;
 
-	const upload = await file.saveFileToLocal(filename, folder, uploadedFile.path);
+	const upload = await file.saveFileToLocal(filename, folder, uploadedFile.path, { unique: true });
 	const storedFile = {
 		url: nconf.get('relative_path') + upload.url,
 		path: upload.path,

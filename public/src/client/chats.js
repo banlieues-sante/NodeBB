@@ -21,11 +21,12 @@ define('forum/chats', [
 	'chat',
 	'api',
 	'uploadHelpers',
+	'modules/flags',
 ], function (
 	components, mousetrap, recentChats, create,
 	manage, messages, userList, messageSearch, pinnedMessages,
 	events, search, autocomplete, hooks, modals, benchpress, alerts,
-	chatModule, api, uploadHelpers
+	chatModule, api, uploadHelpers, flags
 ) {
 	const Chats = {
 		activeAutocomplete: new WeakMap(),
@@ -79,12 +80,6 @@ define('forum/chats', [
 			messages.toggleScrollUpAlert(chatContentEl);
 			const scrollToEl = chatContentEl.find(`[data-index="${ajaxify.data.scrollToIndex - 1}"]`);
 			messages.scrollToMessageAfterImageLoad(chatContentEl, scrollToEl);
-			if (scrollToEl) {
-				scrollToEl.addClass('highlight-pulse');
-				setTimeout(() => {
-					scrollToEl.removeClass('highlight-pulse');
-				}, 5000);
-			}
 		} else {
 			messages.scrollToBottomAfterImageLoad(chatContentEl);
 		}
@@ -112,6 +107,7 @@ define('forum/chats', [
 		Chats.addScrollHandler(roomId, ajaxify.data.uid, chatMessageContent);
 		Chats.addScrollBottomHandler(roomId, chatMessageContent);
 		Chats.addParentHandler(chatMainWrapper);
+		Chats.addPinnedTimestampHandler(chatMainWrapper);
 		Chats.addCharactersLeftHandler(chatMainWrapper);
 		Chats.addTextareaResizeHandler(chatMainWrapper);
 		Chats.addTypingHandler(chatMainWrapper, roomId);
@@ -203,6 +199,20 @@ define('forum/chats', [
 		});
 	};
 
+	function gotoMessage(event, timestampEl, mid) {
+		// :visible because the conversation is swapped out for the message search
+		// results, and there is nothing to scroll while those are shown
+		const contentEl = timestampEl
+			.closest('[component="chat/message/window"]')
+			.find('[component="chat/message/content"]:visible');
+		const messageEl = contentEl.find(`[component="chat/message"][data-mid="${mid}"]`);
+		if (messageEl.length) {
+			event.preventDefault();
+			messages.scrollToMessage(messageEl);
+			return false;
+		}
+	}
+
 	Chats.addParentHandler = function (mainWrapper) {
 		mainWrapper.off('click', '[component="chat/message/parent"]')
 			.on('click', '[component="chat/message/parent"]', function () {
@@ -214,6 +224,30 @@ define('forum/chats', [
 				if (chatContent.length && messages.isAtBottom(chatContent)) {
 					messages.scrollToBottom(chatContent);
 				}
+			});
+
+		// deeper selector, so this runs before the collapse handler above
+		mainWrapper.off('click', '[component="chat/message/parent"] .chat-timestamp')
+			.on('click', '[component="chat/message/parent"] .chat-timestamp', function (ev) {
+				const timestampEl = $(this);
+				return gotoMessage(
+					ev, timestampEl, timestampEl.parents('[data-parent-mid]').attr('data-parent-mid')
+				);
+			});
+	};
+
+	// a pinned message is shown out of context, so its own timestamp links back to
+	// where it sits in the conversation
+	Chats.addPinnedTimestampHandler = function (mainWrapper) {
+		// scoped to .message-header, as the timestamp of a quoted parent rendered in
+		// the panel is already handled by addParentHandler
+		const selector = '[component="chat/messages/pinned"] .message-header .chat-timestamp';
+		mainWrapper.off('click', selector)
+			.on('click', selector, function (ev) {
+				const timestampEl = $(this);
+				return gotoMessage(
+					ev, timestampEl, timestampEl.parents('[component="chat/message"]').attr('data-mid')
+				);
 			});
 	};
 
@@ -306,6 +340,40 @@ define('forum/chats', [
 		});
 	};
 
+	function getTopVisibleMessageIndex(el) {
+		const containerTop = el.offset().top;
+		let index = 0;
+		el.children('[data-index]').each(function () {
+			const msgEl = $(this);
+			const msgIndex = parseInt(msgEl.attr('data-index'), 10);
+			// live-received messages don't carry an index; skip them
+			if (!isNaN(msgIndex) && msgEl.offset().top + msgEl.outerHeight() > containerTop) {
+				index = msgIndex + 1;
+				return false;
+			}
+		});
+		return index;
+	}
+
+	function updateUrlWithMessageIndex(roomId, el) {
+		if (
+			!ajaxify.data.template.chats || !history.replaceState ||
+			String(ajaxify.data.roomId) !== String(roomId) || !ajaxify.data.userslug
+		) {
+			return;
+		}
+		const index = messages.isAtBottom(el) ? 0 : getTopVisibleMessageIndex(el);
+		const newUrl = `user/${ajaxify.data.userslug}/chats/${roomId}${index > 0 ? `/${index}` : ''}`;
+		const fullPath = `${config.relative_path}/${newUrl}`;
+		if (fullPath === window.location.pathname) {
+			return;
+		}
+		const search = window.location.search || '';
+		history.replaceState({
+			url: newUrl + search,
+		}, null, `${window.location.protocol}//${window.location.host}${fullPath}${search}`);
+	}
+
 	Chats.addScrollHandler = function (roomId, uid, el) {
 		let loading = false;
 		let previousScrollTop = el.scrollTop();
@@ -316,6 +384,7 @@ define('forum/chats', [
 			isAtBottom = messages.isAtBottom(el);
 		});
 		el.on('scroll', utils.debounce(async function () {
+			updateUrlWithMessageIndex(roomId, el);
 			if (parseInt(el.attr('data-ignore-next-scroll'), 10) === 1) {
 				el.removeAttr('data-ignore-next-scroll');
 				previousScrollTop = el.scrollTop();
@@ -436,7 +505,18 @@ define('forum/chats', [
 				case 'unpin':
 					pinnedMessages.unpin(messageId, roomId);
 					break;
+				case 'flag':
+					Chats.flagMessage(msgEl.attr('data-mid'), roomId);
+					break;
 			}
+		});
+	};
+
+	Chats.flagMessage = function (messageId, roomId) {
+		flags.showFlagModal({
+			type: 'message',
+			id: messageId,
+			roomId: roomId,
 		});
 	};
 
@@ -722,7 +802,10 @@ define('forum/chats', [
 			roomEl.find('[component="chat/room/teaser"]').html(html[0].outerHTML);
 			roomEl.find('.timeago').timeago();
 			moveChatAndHrToTop(roomEl);
-		} else {
+		} else if (String(ajaxify.data.uid) === String(app.user.uid)) {
+			// The room isn't on screen, so it has to be fetched -- but `GET /chats`
+			// returns the *viewer's* rooms, which have no business being spliced
+			// into a list that is showing another user's rooms.
 			const { rooms } = await api.get(`/chats`, { start: 0, perPage: 2 });
 			const room = rooms.find(r => parseInt(r.roomId, 10) === parseInt(roomId, 10));
 			if (room) {

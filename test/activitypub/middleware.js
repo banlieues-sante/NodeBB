@@ -98,6 +98,26 @@ describe('middleware.verify', () => {
 			assert.strictEqual(response.statusCode, 400);
 		});
 
+		it('should call next() and set req.uid when an RFC 9421 signature is valid', async () => {
+			const path = `/user/${username}/inbox`;
+			const body = { foo: 'bar' };
+			const payload = JSON.stringify(body);
+			const endpoint = `${nconf.get('url')}${path}`;
+			const hash = createHash('sha256');
+			hash.update(payload);
+			const expectedContentDigest = `sha-256=:${hash.digest('base64')}:`;
+			const signedHeaders = await activitypub.signatures.signRfc9421(keyData, endpoint, 'POST', payload);
+			assert.strictEqual(signedHeaders['content-digest'], expectedContentDigest);
+			const req = buildReq('POST', path, signedHeaders);
+			req.body = body;
+			const res = buildRes();
+			const { nextCalled, res: response } = await runMiddleware(req, res);
+
+			assert.strictEqual(nextCalled, true);
+			assert.strictEqual(response.statusCode, null);
+			assert.strictEqual(req.uid, `${nconf.get('url')}/uid/${uid}`);
+		});
+
 		it('should reject with 401 when no signature is present', async () => {
 			const path = `/user/${username}/inbox`;
 			const req = buildReq('POST', path, {});
@@ -188,5 +208,136 @@ describe('middleware.verify', () => {
 			assert.strictEqual(req.uid, expectedUid);
 			assert.notStrictEqual(req.uid, `${nconf.get('url')}/uid/${uid2}`);
 		});
+	});
+
+	describe('keyId with leading whitespace (algorithm before keyId)', () => {
+		it('should extract req.uid even when keyId is preceded by whitespace', async () => {
+			// Regression test: when algorithm precedes keyId in the signature header,
+			// the library trims the leading space before keyId, but the middleware's
+			// naive split(',') does not. Both code paths must trim to stay in sync.
+			const path = `/user/${username}/inbox`;
+			const signedHeaders = await getValidSignature(path);
+
+			// Reorder: algorithm before keyId introduces whitespace before keyId.
+			// The library trims it; the middleware must too.
+			const parts = signedHeaders.signature.split(',');
+			const algorithmPart = parts.find(p => p.startsWith('algorithm='));
+			const signaturePart = parts.find(p => p.startsWith('signature='));
+			const headersPart = parts.find(p => p.startsWith('headers='));
+			const reordered = `${algorithmPart}, keyId="${nconf.get('url')}/uid/${uid}#key", ${headersPart}, ${signaturePart}`;
+
+			const req = buildReq('GET', path, {
+				signature: reordered,
+				date: signedHeaders.date,
+			});
+			const res = buildRes();
+			const { nextCalled, res: response } = await runMiddleware(req, res);
+
+			assert.strictEqual(nextCalled, true);
+			assert.strictEqual(response.statusCode, null);
+			const expectedUid = `${nconf.get('url')}/uid/${uid}`;
+			assert.strictEqual(req.uid, expectedUid);
+		});
+	});
+});
+
+describe('middleware.assertPayload', () => {
+	let uid;
+	let username;
+	let keyData;
+	let path;
+
+	before(async () => {
+		username = utils.generateUUID().slice(0, 10);
+		uid = await user.create({ username });
+		keyData = await activitypub.getPrivateKey('uid', uid);
+		path = `/user/${username}/inbox`;
+	});
+
+	function buildReqWithSignature(method, path, headers = {}) {
+		const { host } = nconf.get('url_parsed');
+		return {
+			method,
+			path,
+			baseUrl: nconf.get('relative_path'),
+			headers: { host, ...headers },
+		};
+	}
+
+	function buildRes() {
+		const res = { statusCode: null };
+		res.sendStatus = (code) => { res.statusCode = code; };
+		return res;
+	}
+
+	async function runPayloadMiddleware(req, body) {
+		const res = buildRes();
+		let nextCalled = false;
+		req.body = body;
+		await middleware.assertPayload(req, res, () => { nextCalled = true; });
+		return { nextCalled, res };
+	}
+
+	it('should reject when the verified keyId does not match the actor\'s stored key', async () => {
+		// The cross-check compares the cryptographically-verified keyId (set on
+		// req.apKeyId by the verify middleware) against the claimed actor's stored
+		// remote key. A local uid has no remote AP keys, so the check must fail.
+		await activitypub.sign(keyData, `${nconf.get('url')}${path}`, null);
+
+		const req = buildReqWithSignature('POST', path, {});
+		// Simulate the verify middleware having verified the signature and recorded
+		// the keyId that actually passed cryptographic verification.
+		req.apKeyId = `${nconf.get('url')}/uid/${uid}#key`;
+		const body = {
+			id: `https://example.org/activity/${utils.generateUUID()}`,
+			type: 'Create',
+			actor: `${nconf.get('url')}/uid/${uid}`,
+			object: { type: 'Note', id: `${nconf.get('url')}/topic/1` },
+		};
+		const res = buildRes();
+		const { nextCalled, res: response } = await runPayloadMiddleware(req, body);
+
+		// The actor (local uid) has no stored keys in the remote AP DB, so compare
+		// is ''. keyId (verified) is the real key URL. '' !== keyId → 403.
+		assert.strictEqual(nextCalled, false);
+		assert.strictEqual(response.statusCode, 403);
+	});
+
+	it('should reject a signed POST that reached assertPayload without a verified keyId', async () => {
+		// Defense in depth: a signed POST must have been verified first. If no
+		// verified keyId is present, the cross-check cannot be satisfied.
+		const req = buildReqWithSignature('POST', path, {});
+		const body = {
+			id: `https://example.org/activity/${utils.generateUUID()}`,
+			type: 'Create',
+			actor: `${nconf.get('url')}/uid/${uid}`,
+			object: { type: 'Note', id: `${nconf.get('url')}/topic/1` },
+		};
+		const res = buildRes();
+		const { nextCalled, res: response } = await runPayloadMiddleware(req, body);
+
+		assert.strictEqual(nextCalled, false);
+		assert.strictEqual(response.statusCode, 403);
+	});
+
+	it('should pass the cross-check when the actor\'s stored key matches the verified keyId', async () => {
+		const actor = `${nconf.get('url')}/uid/${uid}`;
+		const keyId = `${nconf.get('url')}/uid/${uid}#key`;
+		// Store the actor's remote AP key so the cross-check can match it.
+		await db.setObject(`userRemote:${actor}:keys`, { id: keyId });
+
+		const req = buildReqWithSignature('POST', path, {});
+		req.apKeyId = keyId;
+		const body = {
+			id: `https://example.org/activity/${utils.generateUUID()}`,
+			type: 'Create',
+			actor,
+			object: { type: 'Note', id: `${nconf.get('url')}/topic/1` },
+		};
+		const res = buildRes();
+		const { nextCalled, res: response } = await runPayloadMiddleware(req, body);
+
+		assert.strictEqual(nextCalled, true);
+		assert.strictEqual(response.statusCode, null);
 	});
 });

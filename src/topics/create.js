@@ -42,6 +42,10 @@ module.exports = function (Topics) {
 			topicData.tags = data.tags.join(',');
 		}
 
+		if (data.titleEmoji) {
+			topicData.titleEmoji = data.titleEmoji;
+		}
+
 		if (Array.isArray(data.thumbs) && data.thumbs.length) {
 			const thumbs = Topics.thumbs.filterThumbs(data.thumbs);
 			topicData.thumbs = JSON.stringify(thumbs);
@@ -104,6 +108,7 @@ module.exports = function (Topics) {
 			),
 			privileges.users.isAdministrator(uid),
 		]);
+
 
 		data.tags = data.tags || [];
 		data.content = String(data.content || '').trimEnd();
@@ -177,18 +182,9 @@ module.exports = function (Topics) {
 		plugins.hooks.fire('action:topic.post', { topic: topicData, post: postData, data: data });
 
 		if (!topicData.scheduled && !topicData.deleted) {
-			setImmediate(async () => {
-				try {
-					if (utils.isNumber(uid)) {
-						// New topic notifications only sent for local-to-local follows only
-						await user.notifications.sendTopicNotificationToFollowers(uid, topicData, postData);
-					}
-
-					await Topics.notifyTagFollowers(postData, uid);
-					await categories.notifyCategoryFollowers(postData, uid);
-				} catch (err) {
-					winston.error(err.stack);
-				}
+			setImmediate(() => {
+				user.notifications.sendTopicNotificationToFollowers(uid, topicData, postData)
+					.catch(err => winston.error(err.stack));
 			});
 		}
 
@@ -269,7 +265,7 @@ module.exports = function (Topics) {
 			Topics.syncBacklinks({ ...postData, content }),
 			Topics.markAsRead([tid], uid),
 		]);
-		if (utils.isNumber(postOwner) && postData.category.cid === -1) {
+		if (utils.isNumber(postOwner) && postData.category?.cid === -1) {
 			activitypub.notes.syncUserInboxes(tid, uid);
 		}
 

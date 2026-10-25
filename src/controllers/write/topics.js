@@ -227,15 +227,15 @@ Topics.getCrossposts = async (req, res) => {
 };
 
 Topics.crosspost = async (req, res) => {
-	const { cid } = req.body;
+	const cid = String(req.body.cid);
 	const crossposts = await topics.crossposts.add(req.params.tid, cid, req.uid);
-	await activitypub.out.announce.topic(req.params.tid, req.uid);
+	await activitypub.out.announce.topic(req.params.tid, req.uid, cid);
 
 	helpers.formatApiResponse(200, res, { crossposts });
 };
 
 Topics.uncrosspost = async (req, res) => {
-	const cid = req.body.cid || req.query.cid;
+	const cid = String(req.body.cid || req.query.cid);
 	const crossposts = await topics.crossposts.remove(req.params.tid, cid, req.uid);
 
 	await activitypub.out.undo.announce('uid', req.uid, req.params.tid);

@@ -6,7 +6,6 @@ const async = require('async');
 const winston = require('winston');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
-const clean = require('postcss-clean');
 const rtlcss = require('rtlcss');
 const sass = require('../utils').getSass();
 
@@ -237,20 +236,18 @@ actions.buildCSS = async function buildCSS(data) {
 
 
 	async function processScss(direction) {
-		if (direction === 'rtl') {
-			css = await postcss([rtlcss()]).process(css, {
-				from: undefined,
-			});
-		}
-		const postcssArgs = [autoprefixer];
-		if (data.minify) {
-			postcssArgs.push(clean({
-				processImportFrom: ['local'],
-			}));
-		}
-		return await postcss(postcssArgs).process(css, {
+		const postcssArgs = direction === 'rtl' ? [rtlcss(), autoprefixer] : [autoprefixer];
+		const result = await postcss(postcssArgs).process(css, {
 			from: undefined,
 		});
+		if (!data.minify) {
+			return result;
+		}
+		const minified = await sass.compileStringAsync(result.css, {
+			syntax: 'css',
+			style: 'compressed',
+		});
+		return { css: minified.css };
 	}
 
 	const [ltrresult, rtlresult] = await Promise.all([

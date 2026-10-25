@@ -289,10 +289,13 @@ topicsAPI.bump = async (caller, { tid }) => {
 
 	await topics.markAsUnreadForAll(tid);
 	topics.pushUnreadCount(caller.uid);
+
+	activitypub.out.announce.topic(tid, caller.uid);
 };
 
 topicsAPI.move = async (caller, { tid, cid }) => {
 	const tids = Array.isArray(tid) ? tid : [tid];
+	cid = String(cid);
 	const [isAdmin, isModOfDestination, [canCreate, canRead], uids] = await Promise.all([
 		privileges.users.isAdministrator(caller.uid),
 		privileges.users.isModerator(caller.uid, cid),
@@ -353,7 +356,9 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 						activitypub.out.move.context(caller.uid, tid);
 						activitypub.out.announce.topic(tid);
 					}
-					activitypub.out.undo.announce('cid', topicData.cid, tid); // microblogs
+					if (utils.isNumber(topicData.cid) && parseInt(topicData.cid, 10) > 0) {
+						activitypub.out.undo.announce('cid', topicData.cid, tid); // microblogs
+					}
 				});
 			}
 

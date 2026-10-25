@@ -6,10 +6,12 @@ const winston = require('winston');
 const db = require('../../database');
 const meta = require('../../meta');
 const posts = require('../../posts');
+const topics = require('../../topics');
 const user = require('../../user');
 const groups = require('../../groups');
 const privileges = require('../../privileges');
 const activitypub = require('../../activitypub');
+const plugins = require('../../plugins');
 const utils = require('../../utils');
 const helpers = require('../helpers');
 
@@ -17,6 +19,7 @@ const Controller = module.exports;
 
 Controller.actors = require('./actors');
 Controller.topics = require('./topics');
+Controller.emoji = require('./emoji');
 
 Controller.fetch = async (req, res, next) => {
 	// Given a `resource` query parameter, attempts to retrieve and parse it
@@ -48,7 +51,7 @@ Controller.fetch = async (req, res, next) => {
 				}
 
 				default:
-					return helpers.redirect(res, url.href, false);
+					return helpers.redirect(res, { external: url.href });
 			}
 		}
 
@@ -59,13 +62,13 @@ Controller.fetch = async (req, res, next) => {
 			url = new URL(`outgoing?url=${encodeURIComponent(url.href)}`, nconf.get('url'));
 		}
 
-		helpers.redirect(res, url.href, false);
+		helpers.redirect(res, { external: url.href });
 	} catch (e) {
 		if (!url || !url.href) {
 			return next();
 		}
 		activitypub.helpers.log(`[activitypub/fetch] Invalid URL received: ${url}`);
-		helpers.redirect(res, url.href, false);
+		helpers.redirect(res, { external: url.href });
 	}
 };
 
@@ -153,6 +156,11 @@ Controller.getOutbox = async (req, res) => {
 	let activities;
 	let upvotes, downvotes, shares;
 
+	// Pre-declare for topic filtering
+	let postsData = [];
+	let postTids;
+	let hiddenTids = new Set();
+
 	// Fetch enough from each source so that after merging by score and filtering votes/shares,
 	// we still have perPage items. Posts are pre-filtered via category sets; votes/shares are filtered after.
 	const fetchLimit = (perPage * 4) - 1;
@@ -193,9 +201,38 @@ Controller.getOutbox = async (req, res) => {
 			const visibleVotePids = await privileges.posts.filter('topics:read', voteSharePids, callerUid);
 			const visibleVoteSet = new Set(visibleVotePids);
 			allActivities = allActivities.filter(({ type, value }) => {
-				if (type === 'post') return true; // already filtered via category sets
+				if (type === 'post') return true; // topic filtering below
 				return visibleVoteSet.has(value);
 			});
+		}
+
+		// Fetch post summaries for topic deletion/scheduled check
+		const postItems = allActivities.filter(({ type }) => type === 'post');
+		if (postItems.length) {
+			postsData = await posts.getPostSummaryByPids(
+				postItems.map(({ value }) => value), callerUid, { stripTags: false }
+			);
+			postTids = [...new Set(postsData.map(p => p.tid).filter(Boolean))];
+			if (postTids.length) {
+				const topicData = await topics.getTopicsFields(postTids, ['tid', 'deleted', 'scheduled']);
+				hiddenTids = new Set(
+					topicData.filter(t => t.deleted || t.scheduled > Date.now()).map(t => t.tid)
+				);
+			}
+
+			// Filter out posts and votes/shares targeting hidden posts
+			if (hiddenTids.size) {
+				const postTidMap = postsData.reduce((map, p) => {
+					if (p.tid) map.set(p.pid, p.tid);
+					return map;
+				}, new Map());
+				allActivities = allActivities.filter(({ type, value }) => {
+					const pid = parseInt(value, 10);
+					if (type === 'post') return !hiddenTids.has(postTidMap.get(pid));
+					const targetTid = postTidMap.get(pid);
+					return targetTid !== undefined ? !hiddenTids.has(targetTid) : true;
+				});
+			}
 		}
 
 		// Slice to perPage
@@ -210,14 +247,12 @@ Controller.getOutbox = async (req, res) => {
 		prev = `${nconf.get('url')}/uid/${uid}/outbox?before=${allActivities[0].score}`;
 		next = `${nconf.get('url')}/uid/${uid}/outbox?after=${allActivities[allActivities.length - 1].score}`;
 
-		const postItems = allActivities.filter((({ type }) => type === 'post'));
-		const postsData = await posts.getPostSummaryByPids(
-			postItems.map(({ value }) => value), callerUid, { stripTags: false }
-		);
-		const postsMap = postsData.reduce((map, postData) => {
-			map.set(postData.pid, postData);
-			return map;
-		}, new Map());
+		const postsMap = (postsData || [])
+			.filter(p => !hiddenTids.has(p.tid))
+			.reduce((map, postData) => {
+				map.set(postData.pid, postData);
+				return map;
+			}, new Map());
 
 		activities = await Promise.all(allActivities.map(async ({ type, value: id }) => {
 			switch (type) {
@@ -361,13 +396,26 @@ Controller.getInbox = async (req, res) => {
 Controller.postInbox = async (req, res) => {
 	// Note: underlying methods are internal use only, hence no exposure via src/api
 	const method = String(req.body.type).toLowerCase();
-	if (!activitypub.inbox.hasOwnProperty(method)) {
-		activitypub.helpers.log(`[activitypub/inbox] Received Activity of type ${method} but unable to handle. Ignoring.`);
-		return res.sendStatus(200);
-	}
-
 	const originalBody = structuredClone(req.body);
+
 	try {
+		// Plugins may claim (and/or transparently rewrite) the activity before built-in handling
+		const context = await plugins.hooks.fire(`filter:activitypub.${method}`, {
+			req,
+			activity: req.body,
+			claimed: false,
+		});
+		if (context.claimed) {
+			await activitypub.analytics.receipt(context.activity);
+			return helpers.formatApiResponse(202, res);
+		}
+		req.body = context.activity;
+
+		if (!activitypub.inbox.hasOwnProperty(method)) {
+			activitypub.helpers.log(`[activitypub/inbox] Received Activity of type ${method} but unable to handle. Ignoring.`);
+			return res.sendStatus(200);
+		}
+
 		await activitypub.inbox[method](req);
 		await activitypub.analytics.receipt(req.body);
 		await helpers.formatApiResponse(202, res);

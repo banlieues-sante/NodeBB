@@ -23,7 +23,7 @@ privsPosts.get = async function (pids, uid) {
 	if (!Array.isArray(pids) || !pids.length) {
 		return [];
 	}
-	const postData = await posts.getPostsFields(pids, ['tid']);
+	const postData = await posts.getPostsFields(pids, ['tid', 'uid']);
 	const uniqTids = _.uniq(postData.map(p => p && p.tid).filter(Boolean));
 	const topicData = await topics.getTopicsFields(uniqTids, ['cid', 'uid', 'deleted', 'scheduled']);
 	const tidToTopic = _.zipObject(uniqTids, topicData);
@@ -32,7 +32,6 @@ privsPosts.get = async function (pids, uid) {
 	const results = await utils.promiseParallel({
 		isAdmin: user.isAdministrator(uid),
 		isModerator: user.isModerator(uid, uniqueCids),
-		isOwner: posts.isOwner(pids, uid),
 		read: helpers.isAllowedTo('read', uid, uniqueCids),
 		'topics:read': helpers.isAllowedTo('topics:read', uid, uniqueCids),
 		'topics:schedule': helpers.isAllowedTo('topics:schedule', uid, uniqueCids),
@@ -55,11 +54,12 @@ privsPosts.get = async function (pids, uid) {
 	const privileges = postData.map((post, i) => {
 		const topic = tidToTopic[post.tid] || {};
 		const { cid } = topic;
+		const isPostOwner = String(post.uid) === String(uid);
 		const isTopicOwner = String(topic.uid) === String(uid);
 		const isAdminOrMod = results.isAdmin || isModerator[cid];
-		const editable = (privData['posts:edit'][cid] && (results.isOwner[i] || results.isModerator[i])) || results.isAdmin;
-		const viewDeletedPosts = results.isOwner[i] || privData['posts:view_deleted'][cid] || results.isAdmin;
-		const viewHistory = results.isOwner[i] || privData['posts:history'][cid] || results.isAdmin;
+		const editable = (privData['posts:edit'][cid] && (isPostOwner || results.isModerator[i])) || results.isAdmin;
+		const viewDeletedPosts = isPostOwner || privData['posts:view_deleted'][cid] || results.isAdmin;
+		const viewHistory = isPostOwner || privData['posts:history'][cid] || results.isAdmin;
 
 		const canViewDeletedScheduled = privsTopics.canViewDeletedScheduled(topic, {
 			view_deleted: results.isAdmin || isTopicOwner || privData['posts:view_deleted'][cid],
@@ -175,19 +175,22 @@ privsPosts.canEdit = async function (pid, uid) {
 		return { flag: false, message: `[[error:post-edit-duration-expired, ${meta.config.newbiePostEditDuration}]]` };
 	}
 
-	const isLocked = await topics.isLocked(results.postData.tid);
-	if (!results.isMod && isLocked) {
-		return { flag: false, message: '[[error:topic-locked]]' };
-	}
-
-	if (!results.isMod && results.postData.deleted && parseInt(uid, 10) !== parseInt(results.postData.deleterUid, 10)) {
-		return { flag: false, message: '[[error:post-deleted]]' };
-	}
-
+	results.isLocked = await topics.isLocked(results.postData.tid);
 	results.pid = utils.isNumber(pid) ? parseInt(pid, 10) : pid;
 	results.uid = uid;
 
+	// Fired ahead of the lock and deleted-post gates, so that plugins can grant
+	// edit access inside a locked topic by unsetting `isLocked`.
 	const result = await plugins.hooks.fire('filter:privileges.posts.edit', results);
+
+	if (!result.isMod && result.isLocked) {
+		return { flag: false, message: '[[error:topic-locked]]' };
+	}
+
+	if (!result.isMod && result.postData.deleted && parseInt(uid, 10) !== parseInt(result.postData.deleterUid, 10)) {
+		return { flag: false, message: '[[error:post-deleted]]' };
+	}
+
 	return {
 		flag: result.edit && (result.isOwner || result.isEditor || result.isGroupEditor || result.isMod),
 		message: '[[error:no-privileges]]',
@@ -216,16 +219,24 @@ privsPosts.canDelete = async function (pid, uid) {
 		return { flag: true };
 	}
 
-	if (!results.isMod && results.isLocked) {
+	results.pid = utils.isNumber(pid) ? parseInt(pid, 10) : pid;
+	results.uid = uid;
+	results.postData = postData;
+
+	// Fired ahead of the lock and delete-duration gates, so that plugins can
+	// grant delete access inside a locked topic by unsetting `isLocked`.
+	const result = await plugins.hooks.fire('filter:privileges.posts.delete', results);
+
+	if (!result.isMod && result.isLocked) {
 		return { flag: false, message: '[[error:topic-locked]]' };
 	}
 
 	const { postDeleteDuration } = meta.config;
-	if (!results.isMod && postDeleteDuration && (Date.now() - postData.timestamp > postDeleteDuration * 1000)) {
+	if (!result.isMod && postDeleteDuration && (Date.now() - postData.timestamp > postDeleteDuration * 1000)) {
 		return { flag: false, message: `[[error:post-delete-duration-expired, ${meta.config.postDeleteDuration}]]` };
 	}
 	const { deleterUid } = postData;
-	const flag = results['posts:delete'] && ((results.isOwner && (deleterUid === 0 || deleterUid === postData.uid)) || results.isMod);
+	const flag = result['posts:delete'] && ((result.isOwner && (deleterUid === 0 || deleterUid === postData.uid)) || result.isMod);
 	return { flag: flag, message: '[[error:no-privileges]]' };
 };
 

@@ -106,8 +106,15 @@ define('chat', [
 				const html = await app.parseAndTranslate('partials/chats/dropdown', { rooms: rooms });
 				const listEl = chatsListEl.get(0);
 
+				const prevFirstRoom = listEl.querySelector('[data-roomid]');
+				const prevFirstRoomKey = prevFirstRoom && `${prevFirstRoom.getAttribute('data-roomid')}:${prevFirstRoom.classList.contains('unread')}`;
 				chatsListEl.find('*').not('.navigation-link').remove();
 				chatsListEl.prepend(html);
+				const firstRoom = listEl.querySelector('[data-roomid]');
+				const firstRoomKey = firstRoom && `${firstRoom.getAttribute('data-roomid')}:${firstRoom.classList.contains('unread')}`;
+				if (prevFirstRoomKey && prevFirstRoomKey !== firstRoomKey) {
+					listEl.scrollTop = 0;
+				}
 				chatsListEl.off('click').on('click', '[data-roomid]', function (ev) {
 					if (['.user-link', '.mark-read'].some(className => ev.target.closest(className))) {
 						return;
@@ -163,7 +170,7 @@ define('chat', [
 	};
 
 	Chat.isFromBlockedUser = function (fromUid) {
-		return app.user.blocks.includes(parseInt(fromUid, 10));
+		return app.user.blocks.includes(String(fromUid));
 	};
 
 	Chat.isLookingAtRoom = function (roomId) {
@@ -193,8 +200,7 @@ define('chat', [
 				modal.attr('new-message', data.self === 0 ? 1 : 0);
 			}
 			data.message.self = data.self;
-			data.message.timestamp = Math.min(Date.now(), data.message.timestamp);
-			data.message.timestampISO = utils.toISOString(data.message.timestamp);
+			data.message.timestampISO = utils.toISOString(Math.min(Date.now(), data.message.timestamp));
 			addMessageToModal(data);
 		}
 	};
@@ -441,7 +447,7 @@ define('chat', [
 				Chats.addActionHandlers(chatModal.find('[component="chat/message/window"]'), roomId);
 				Chats.addRenameHandler(roomId, chatModal.find('[data-action="rename"]'));
 				Chats.addLeaveHandler(roomId, chatModal.find('[data-action="leave"]'));
-				Chats.addDeleteHandler(roomId, chatModal.find('[data-action="delete"]'));
+				Chats.addDeleteHandler(roomId, chatModal.find('[component="chat/controls"] [data-action="delete"]'));
 				Chats.addSendHandlers(roomId, chatModal.find('.chat-input'), chatModal.find('[data-action="send"]'));
 				Chats.addManageHandler(roomId, chatModal.find('[data-action="manage"]'));
 
@@ -525,6 +531,7 @@ define('chat', [
 
 	Chat.close = function (uuid) {
 		const chatModal = $('.chat-modal[data-uuid="' + uuid + '"]');
+		chatModal.find('[data-bs-toggle="tooltip"]').tooltip('dispose');
 		chatModal.remove();
 		chatModal.data('modal', null);
 		taskbar.discard('chat', uuid);
@@ -622,6 +629,7 @@ define('chat', [
 
 	Chat.minimize = function (uuid) {
 		const chatModal = $('.chat-modal[data-uuid="' + uuid + '"]');
+		chatModal.find('[data-bs-toggle="tooltip"]').tooltip('hide');
 		chatModal.addClass('hide');
 		taskbar.minimize('chat', uuid);
 		hooks.fire('action:chat.minimized', {

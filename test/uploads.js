@@ -1,6 +1,5 @@
 'use strict';
 
-const async = require('async');
 const assert = require('assert');
 const nconf = require('nconf');
 const path = require('path');
@@ -18,6 +17,7 @@ const socketUser = require('../src/socket.io/user');
 const helpers = require('./helpers');
 const file = require('../src/file');
 const image = require('../src/image');
+const uploads = require('../src/middleware/uploads');
 const request = require('../src/request');
 
 const emptyUploadsFolder = async () => {
@@ -104,6 +104,19 @@ describe('Upload Controllers', () => {
 			assert.deepStrictEqual(Object.keys(body.response.images[0]), ['url', 'name']);
 		});
 
+		it('should upload an image with -resized.png in its filename', async () => {
+			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/post/upload`, path.join(__dirname, '../test/files/test-resized.png'), {}, jar, csrf_token);
+			assert.equal(response.statusCode, 200);
+			const image = body.response.images[0];
+			// image name is unchanged
+			assert.strictEqual(image.name, 'test-resized.png');
+			// saved file has no -resized at the end ie test-resized.png becomes test.png
+			assert(image.url.endsWith('-test.png'));
+			// user record doesn't have -resized at the end
+			const [userUpload] = await db.getSortedSetRevRange(`uid:${regularUid}:uploads`, 0, 0);
+			assert(image.url.endsWith(userUpload), userUpload);
+		});
+
 		it('should upload an svg image to a post', async () => {
 			const oldValue = meta.config.allowedFileExtensions;
 			meta.config.allowedFileExtensions = 'png,jpg,bmp,html,svg';
@@ -188,6 +201,16 @@ describe('Upload Controllers', () => {
 			assert(Array.isArray(body.response.images));
 			assert(body.response.images[0].url);
 			assert.deepStrictEqual(Object.keys(body.response.images[0]), ['url', 'name']);
+		});
+
+		it('should keep the original name when the file has no extension', async () => {
+			const oldValue = meta.config.allowedFileExtensions;
+			meta.config.allowedFileExtensions = '';
+			const { response, body } = await helpers.uploadFile(`${nconf.get('url')}/api/post/upload`, path.join(__dirname, '../test/files/noextension'), {}, jar, csrf_token);
+			meta.config.allowedFileExtensions = oldValue;
+
+			assert.strictEqual(response.statusCode, 200);
+			assert(body.response.images[0].url.endsWith('-noextension'));
 		});
 
 		it('should upload a file with utf8 characters in the name to a post', async () => {
@@ -776,6 +799,41 @@ describe('Upload Controllers', () => {
 		after(emptyUploadsFolder);
 	});
 
+	describe('middleware.setSafeFileHeaders()', () => {
+		function mockRes() {
+			const headers = {};
+			return {
+				headers,
+				setHeader(name, value) {
+					headers[name.toLowerCase()] = value;
+					return this;
+				},
+				attachment(filename) {
+					this.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+					return this;
+				},
+			};
+		}
+
+		it('should always set X-Content-Type-Options: nosniff', () => {
+			const res = mockRes();
+			uploads.setSafeFileHeaders(res, 'test.png');
+			assert.strictEqual(res.headers['x-content-type-options'], 'nosniff');
+		});
+
+		it('should force a download for unsafe extensions (SVG)', () => {
+			const res = mockRes();
+			uploads.setSafeFileHeaders(res, 'pwn.svg');
+			assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="pwn.svg"');
+		});
+
+		it('should not force a download for safe image extensions', () => {
+			const res = mockRes();
+			uploads.setSafeFileHeaders(res, 'test.png');
+			assert.strictEqual(res.headers['content-disposition'], undefined);
+		});
+	});
+
 	describe('library methods', () => {
 		describe('.getOrphans()', () => {
 			before(async () => {
@@ -839,6 +897,38 @@ describe('Upload Controllers', () => {
 			after(async () => {
 				await emptyUploadsFolder();
 				meta.config.orphanExpiryDays = _orphanExpiryDays;
+			});
+		});
+
+		describe('.getUploadsForPost() should ignore ? suffixes after file path', () => {
+			let relPath;
+			const relativePath = nconf.get('relative_path') || '';
+			before(async () => {
+				const { jar, csrf_token } = await helpers.loginUser('regular', 'zugzug');
+				const { body } = await helpers.uploadFile(`${nconf.get('url')}/api/post/upload`, path.join(__dirname, '../test/files/test.png'), {}, jar, csrf_token);
+				relPath = body.response.images[0].url.slice(body.response.images[0].url.indexOf('/files/'));
+			});
+
+			it('should strip a width x height suffix (?w=1920&h=1080)', async () => {
+				const content = `![alt](${relativePath}/assets/uploads${relPath}?w=1920&h=1080)`;
+				const uploads = await posts.uploads.getUploadsForPost({ tid: 0, content }, false);
+				assert.deepStrictEqual(uploads, [relPath]);
+			});
+
+			it('should strip a percentage suffix (?w=50%)', async () => {
+				const content = `![alt](${relativePath}/assets/uploads${relPath}?w=50%)`;
+				const uploads = await posts.uploads.getUploadsForPost({ tid: 0, content }, false);
+				assert.deepStrictEqual(uploads, [relPath]);
+			});
+
+			it('should strip a width-only/multiplier suffix (?w=200)', async () => {
+				const content = `![alt](${relativePath}/assets/uploads${relPath}?w=200)`;
+				const uploads = await posts.uploads.getUploadsForPost({ tid: 0, content }, false);
+				assert.deepStrictEqual(uploads, [relPath]);
+			});
+
+			after(async () => {
+				await emptyUploadsFolder();
 			});
 		});
 	});

@@ -47,9 +47,7 @@ module.exports = function (middleware) {
 				options.url = options.url || (req.baseUrl + req.path.replace(/^\/api/, ''));
 				options.bodyClass = helpers.buildBodyClass(req, res, options);
 
-				if (req.loggedIn) {
-					res.set('cache-control', 'private');
-				}
+				res.set('cache-control', 'private, no-cache');
 
 				const buildResult = await plugins.hooks.fire(`filter:${template}.build`, {
 					req: req,
@@ -414,17 +412,18 @@ module.exports = function (middleware) {
 			unreadChatCount: messaging.getUnreadCount(uid),
 			unreadNotificationCount: user.notifications.getUnreadCount(uid),
 			unreadFlagCount: (async function () {
-				if (routes.includes('/flags') && await user.isPrivileged(uid)) {
-					return flags.getCount({
-						uid,
-						query,
-						filters: {
-							quick: 'unresolved',
-							cid: (await user.isAdminOrGlobalMod(uid)) ? [] : (await user.getModeratedCids(uid)),
-						},
-					});
+				if (!routes.includes('/flags')) {
+					return 0;
 				}
-				return 0;
+				const visibleSets = await flags.getVisibleSets(uid);
+				if (visibleSets && !visibleSets.length) {
+					return 0;
+				}
+				const filters = { quick: 'unresolved' };
+				if (visibleSets) {
+					filters.visible = visibleSets;
+				}
+				return flags.getCount({ uid, query, filters });
 			}()),
 		};
 		const results = await utils.promiseParallel(calls);
@@ -451,7 +450,8 @@ module.exports = function (middleware) {
 		const { tidsByFilter } = results.unreadData;
 		navigation = navigation.map((item) => {
 			function modifyNavItem(item, route, filter, content) {
-				if (item && item.route === route) {
+				// navigation routes are prefixed with relative_path in navigation.get
+				if (item && item.route === relative_path + route) {
 					unreadData[filter] = _.zipObject(tidsByFilter[filter], tidsByFilter[filter].map(() => true));
 					item.content = content;
 					unreadCount.mobileUnread = content;
@@ -467,7 +467,7 @@ module.exports = function (middleware) {
 			modifyNavItem(item, '/unread?filter=unreplied', 'unreplied', unreadCount.unrepliedTopic);
 
 			['flags'].forEach((prop) => {
-				if (item && item.route === `/${prop}` && unreadCount[prop] > 0) {
+				if (item && item.route === `${relative_path}/${prop}` && unreadCount[prop] > 0) {
 					item.iconClass += ' unread-count';
 					item.content = unreadCount.flags;
 				}

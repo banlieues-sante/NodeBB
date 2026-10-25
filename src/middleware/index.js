@@ -319,7 +319,9 @@ middleware.requirePageReAuth = function ({ reauthWindowMinutes = 2 } = {}) {
 		} else {
 			req.session.returnTo = req.url;
 			const isAdminPath = req.path === '/admin' || req.path.startsWith('/admin/');
-			res.redirect(`${relative_path}/login${isAdminPath ? '?local=1' : ''}`);
+			req.session.save(() => {
+				res.redirect(`${relative_path}/login${isAdminPath ? '?local=1' : ''}`);
+			});
 		}
 	}
 	return helpers.try(async (req, res, next) => {
@@ -353,7 +355,9 @@ middleware.requireAPIReAuth = function ({ reauthWindowMinutes = 2 } = {}) {
 			return next();
 		}
 
-		req.session.returnTo = normalizeReturnToPath(req, req.headers['x-return-to']) || '/';
+		req.session.returnTo = controllers.helpers.normalizeReturnToPath(
+			req.headers['x-return-to'], { allowApi: false }
+		) || '/';
 
 		if (await triggerReLoginHook(req, res)) {
 			return;
@@ -373,33 +377,4 @@ async function triggerReLoginHook(req, res) {
 	req.session.forceLogin = 1;
 	await plugins.hooks.fire('response:auth.relogin', { req, res });
 	return res.headersSent;
-}
-
-function normalizeReturnToPath(req, pathCandidate) {
-	if (typeof pathCandidate !== 'string') {
-		return '';
-	}
-
-	let p;
-	try {
-		p = decodeURIComponent(pathCandidate.trim());
-	} catch {
-		return '';
-	}
-
-	if (!p.startsWith('/') || p.startsWith('//')) {
-		return '';
-	}
-	p = path.posix.normalize(p);
-
-	if (relative_path && p.startsWith(relative_path)) {
-		p = p.slice(relative_path.length) || '/';
-	}
-
-	// Never redirect to API routes after a browser login
-	if (/^\/api(?:\/|$)/.test(p)) {
-		return '';
-	}
-
-	return p;
 }

@@ -1111,12 +1111,12 @@ describe('Topic\'s', () => {
 			assert.equal(response.statusCode, 404);
 		});
 
-		it('should 401 if not allowed to read as guest', async () => {
+		it('should 404 if not allowed to read as guest', async () => {
 			const privileges = require('../src/privileges');
 			await privileges.categories.rescind(['groups:topics:read'], topicData.cid, 'guests');
 
 			const { response, body } = await request.get(`${nconf.get('url')}/api/topic/${topicData.slug}`);
-			assert.equal(response.statusCode, 401);
+			assert.equal(response.statusCode, 404);
 			assert(body);
 			await privileges.categories.give(['groups:topics:read'], topicData.cid, 'guests');
 		});
@@ -1155,10 +1155,10 @@ describe('Topic\'s', () => {
 			assert.equal(response.statusCode, 404);
 		});
 
-		it('should 403 if cant read', async () => {
+		it('should 404 if cant read', async () => {
 			const { response, body } = await request.get(`${nconf.get('url')}/api/topic/teaser/${123123}`);
-			assert.equal(response.statusCode, 403);
-			assert.equal(body, '[[error:no-privileges]]');
+			assert.equal(response.statusCode, 404);
+			assert.equal(body, 'not-found');
 		});
 
 		it('should load topic teaser', async () => {
@@ -1546,14 +1546,16 @@ describe('Topic\'s', () => {
 				assert.ifError(err);
 				assert.equal(data.matchCount, 5);
 				assert.equal(data.pageCount, 1);
-				const tagData = [
-					{ value: 'nodebb', valueEncoded: 'nodebb', score: 3, class: 'nodebb' },
-					{ value: 'node & c++', valueEncoded: 'node%20%26%20c%2B%2B', score: 1, class: 'node-&-c++' },
-					{ value: 'node icon', valueEncoded: 'node%20icon', score: 1, class: 'node-icon' },
-					{ value: 'nodejs', valueEncoded: 'nodejs', score: 1, class: 'nodejs' },
-					{ value: 'nosql', valueEncoded: 'nosql', score: 1, class: 'nosql' },
-				];
-				assert.deepEqual(data.tags, tagData);
+				const expected = ['nodebb', 'node & c++', 'node icon', 'nodejs', 'nosql'];
+				const actual = data.tags.map(t => t.value);
+				expected.forEach((tag) => {
+					assert.notEqual(actual.indexOf(tag), -1, `Expected tag ${tag} to be present`);
+				});
+				data.tags.forEach((tag) => {
+					assert.ok(tag.score >= 1, `Tag ${tag.value} should have score >= 1`);
+					assert.equal(tag.valueEncoded, encodeURIComponent(tag.value));
+					assert.equal(tag.class, tag.value.replace(/\s/g, '-'));
+				});
 
 				done();
 			});
@@ -1636,6 +1638,38 @@ describe('Topic\'s', () => {
 			const data = await topics.getTopicData(result2.topicData.tid);
 			assert.strictEqual(tags.length, 1);
 			assert.strictEqual(tags[0], 'plugins');
+		});
+
+		it('should not delete a tag when the new name cleans up to the same tag', async () => {
+			const { caseSensitiveTags } = meta.config;
+			meta.config.caseSensitiveTags = 0;
+			try {
+				const { topicData } = await topics.post({ uid: adminUid, tags: ['samename'], title: 'topic tagged with samename', content: 'topic content', cid: topic.categoryId });
+
+				await socketAdmin.tags.rename({ uid: adminUid }, [{
+					value: 'samename',
+					newName: 'SameName',
+				}]);
+
+				assert.deepStrictEqual(await topics.getTagTids('samename', 0, -1), [String(topicData.tid)]);
+				assert.strictEqual(await db.sortedSetScore('tags:topic:count', 'samename'), 1);
+				assert.deepStrictEqual(await topics.getTopicTags(topicData.tid), ['samename']);
+			} finally {
+				meta.config.caseSensitiveTags = caseSensitiveTags;
+			}
+		});
+
+		it('should rename a tag to a different case when tags are case sensitive', async () => {
+			const { topicData } = await topics.post({ uid: adminUid, tags: ['casetag'], title: 'topic tagged with casetag', content: 'topic content', cid: topic.categoryId });
+
+			await socketAdmin.tags.rename({ uid: adminUid }, [{
+				value: 'casetag',
+				newName: 'CaseTag',
+			}]);
+
+			assert.deepStrictEqual(await topics.getTagTids('casetag', 0, -1), []);
+			assert.deepStrictEqual(await topics.getTagTids('CaseTag', 0, -1), [String(topicData.tid)]);
+			assert.deepStrictEqual(await topics.getTopicTags(topicData.tid), ['CaseTag']);
 		});
 
 		it('should return related topics', (done) => {
@@ -1996,6 +2030,36 @@ describe('Topic\'s', () => {
 		});
 	});
 
+	describe('topic views', () => {
+		let viewsTid;
+
+		before(async () => {
+			const result = await topics.post({
+				uid: adminUid,
+				title: 'topic views test',
+				content: 'topic views test content',
+				cid: categoryObj.cid,
+			});
+			viewsTid = result.topicData.tid;
+		});
+
+		it('should only increment the view count once per interval', async () => {
+			const req = { uid: fooUid, session: {} };
+			await topics.increaseViewCount(req, viewsTid);
+			await topics.increaseViewCount(req, viewsTid);
+			assert.strictEqual(await topics.getTopicField(viewsTid, 'viewcount'), 1);
+			assert.deepStrictEqual(Object.keys(req.session.tids_viewed), [String(viewsTid)]);
+		});
+
+		it('should prune expired entries from the session', async () => {
+			const expired = Date.now() - ((meta.config.incrementTopicViewsInterval + 1) * 60000);
+			const req = { uid: fooUid, session: { tids_viewed: { 1: expired, 2: expired } } };
+			await topics.increaseViewCount(req, viewsTid);
+			assert.deepStrictEqual(Object.keys(req.session.tids_viewed), [String(viewsTid)]);
+			assert.strictEqual(await topics.getTopicField(viewsTid, 'viewcount'), 2);
+		});
+	});
+
 	it('should check if user is moderator', (done) => {
 		socketTopics.isModerator({ uid: adminUid }, topic.tid, (err, isModerator) => {
 			assert.ifError(err);
@@ -2147,6 +2211,24 @@ describe('Topic\'s', () => {
 			const teaser = await topics.getTeaser(topic2.topicData.tid, adminUid);
 			assert.equal(teaser.content, 'content 2');
 			await User.blocks.remove(blockedUid, adminUid);
+		});
+
+		it('should not show deleted posts as teasers', async () => {
+			const { topicData } = await topics.post({
+				uid: adminUid,
+				title: 'topic with deleted posts',
+				content: 'content 1',
+				cid: categoryObj.cid,
+			});
+			const { pid } = await topics.reply({ uid: adminUid, content: 'reply 1 content', tid: topicData.tid });
+			await posts.delete(pid, adminUid);
+			await posts.delete(topicData.mainPid);
+			const teasers = await topics.getTeasers([topicData], {
+				uid: 0, // call as guest
+				teaserPost: 'last-post',
+			});
+
+			assert.deepStrictEqual(teasers[0], null);
 		});
 	});
 

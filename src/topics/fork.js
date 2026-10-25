@@ -35,6 +35,11 @@ module.exports = function (Topics) {
 		if (!cid) {
 			cid = await posts.getCidByPid(mainPid);
 		}
+		// A one-element array cid would make isModerator return a (truthy) array,
+		// bypassing the isAdminOrMod gate below. Coerce to a scalar.
+		if (Array.isArray(cid)) {
+			cid = cid[0];
+		}
 
 		const [mainPost, isAdminOrMod] = await Promise.all([
 			posts.getPostData(mainPid),
@@ -86,7 +91,7 @@ module.exports = function (Topics) {
 				forkTimestamp: now,
 			}),
 			db.sortedSetsAdd(['topics:votes', `cid:${cid}:tids:votes`], mainPost.votes, tid),
-			Topics.events.log(fromTid, { type: 'fork', uid, href: `/topic/${tid}` }),
+			Topics.events.log(fromTid, { type: 'fork', uid, toCid: cid, href: `/topic/${tid}` }),
 		]);
 
 		// ideally we should federate a "move" activity instead, then can capture remote posts too. tbd

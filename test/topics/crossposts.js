@@ -124,7 +124,7 @@ describe('Crossposting (& related logic)', () => {
 			}, {
 				uid,
 				tid,
-				cid: cid2,
+				cid: String(cid2),
 			});
 		});
 
@@ -634,6 +634,24 @@ describe('Crossposting (& related logic)', () => {
 				const authorUrl = await posts.getPostField(pid, 'uid');
 				assert(actual.payload.cc.includes(authorUrl));
 				assert(actual.targets.includes(authorUrl));
+			});
+
+			it('should not send an Announce when crossposted to a non-federated category', async () => {
+				const username = utils.generateUUID().slice(0, 8);
+				const crossposter = await user.create({ username, password: '123456' });
+				const login = await helpers.loginUser(username, '123456');
+				activitypub._sent.clear();
+
+				const crosspostCid = (await categories.create({ name: utils.generateUUID().slice(0, 8) })).cid;
+				await privileges.categories.rescind(['groups:topics:read'], crosspostCid, 'fediverse');
+				const result = await helpers.request('post', `/api/v3/topics/${tid}/crossposts`, {
+					jar: login.jar,
+					csrf_token: login.csrf_token,
+					body: { cid: crosspostCid },
+				});
+
+				assert.strictEqual(result.response.statusCode, 200);
+				assert.strictEqual(activitypub._sent.size, 0);
 			});
 		});
 

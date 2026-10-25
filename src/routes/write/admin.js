@@ -12,6 +12,8 @@ module.exports = function () {
 
 	setupApiRoute(router, 'put', '/settings/:setting', [...middlewares, middleware.checkRequired.bind(null, ['value'])], controllers.write.admin.updateSetting);
 
+	setupApiRoute(router, 'put', '/users/custom-fields', [...middlewares, middleware.checkRequired.bind(null, ['fields'])], controllers.write.admin.saveCustomUserFields);
+
 	setupApiRoute(router, 'get', '/analytics', [...middlewares], controllers.write.admin.getAnalyticsKeys);
 	setupApiRoute(router, 'get', '/analytics/:set', [...middlewares], controllers.write.admin.getAnalyticsData);
 	const requireAPIReAuth = middleware.requireAPIReAuth();
@@ -46,6 +48,12 @@ module.exports = function () {
 	setupApiRoute(router, 'get', '/activitypub/blocklists/:url', [...middlewares], controllers.write.admin.activitypub.viewBlocklist);
 	setupApiRoute(router, 'delete', '/activitypub/blocklists/:url', [...middlewares], controllers.write.admin.activitypub.removeBlocklist);
 	setupApiRoute(router, 'post', '/activitypub/blocklists/:url/refresh', [...middlewares], controllers.write.admin.activitypub.refreshBlocklist);
+
+	setupApiRoute(router, 'get', '/activitypub/hashtags', [...middlewares], controllers.write.admin.activitypub.getHashtags);
+	setupApiRoute(router, 'post', '/activitypub/hashtags', [...middlewares, middleware.checkRequired.bind(null, ['tag'])], controllers.write.admin.activitypub.addHashtag);
+	setupApiRoute(router, 'delete', '/activitypub/hashtags/:tag', [...middlewares], controllers.write.admin.activitypub.removeHashtag);
+	setupApiRoute(router, 'get', '/activitypub/hashtags/relay', [...middlewares], controllers.write.admin.activitypub.getHashtagRelay);
+	setupApiRoute(router, 'put', '/activitypub/hashtags/relay', [...middlewares, middleware.checkRequired.bind(null, ['host'])], controllers.write.admin.activitypub.setHashtagRelay);
 
 	setupApiRoute(router, 'post', '/plugins/:pluginId', [...middlewares, requireAPIReAuth], controllers.write.admin.plugins.install);
 	setupApiRoute(router, 'delete', '/plugins/:pluginId', [...middlewares], controllers.write.admin.plugins.uninstall);

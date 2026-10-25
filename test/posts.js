@@ -16,6 +16,7 @@ const categories = require('../src/categories');
 const privileges = require('../src/privileges');
 const user = require('../src/user');
 const groups = require('../src/groups');
+const plugins = require('../src/plugins');
 const socketPosts = require('../src/socket.io/posts');
 const apiPosts = require('../src/api/posts');
 const apiTopics = require('../src/api/topics');
@@ -871,7 +872,7 @@ describe('Post\'s', () => {
 
 		it('should fail to get raw post because post is deleted', async () => {
 			await posts.setPostField(pid, 'deleted', 1);
-			const content = await apiPosts.getRaw({ uid: voterUid }, { pid });
+			const content = await apiPosts.getRaw({ uid: voteeUid }, { pid });
 			assert.strictEqual(content, null);
 		});
 
@@ -1096,6 +1097,17 @@ describe('Post\'s', () => {
 			assert(!Object.hasOwn(posts[0].data, 'req'));
 		});
 
+		it('should load queued posts for a category moderator', async () => {
+			const modUid = await user.create({ username: 'queuecatmod', password: 'queuecatmodpwd' });
+			await privileges.categories.give(['moderate'], cid, modUid);
+			const { jar: modJar } = await helpers.loginUser('queuecatmod', 'queuecatmodpwd');
+			const { body } = await request.get(`${nconf.get('url')}/api/post-queue`, { jar: modJar });
+			const ids = body.posts.map(p => p.id);
+			assert(ids.includes(topicQueueId));
+			assert(ids.includes(queueId));
+			await privileges.categories.rescind(['moderate'], cid, modUid);
+		});
+
 		it('should error if data is invalid', async () => {
 			await assert.rejects(
 				apiPosts.editQueuedPost({ uid: globalModUid }, null),
@@ -1128,10 +1140,27 @@ describe('Post\'s', () => {
 			await apiPosts.editQueuedPost({ uid: globalModUid }, { id: topicQueueId, cid: cid });
 		});
 
+
+		it('should fail to approve self post', async () => {
+			const { id, queued} = await apiTopics.create({ uid: uid }, { title: 'should be queued', content: 'queued topic content', cid });
+			assert.strictEqual(queued, true);
+
+			await assert.rejects(
+				apiPosts.acceptQueuedPost({ uid: uid }, { id: id }),
+				{ message: '[[error:no-post]]' },
+			);
+			await apiPosts.editQueuedPost({ uid: uid }, { id: id, cid: [2] });
+			await assert.rejects(
+				apiPosts.acceptQueuedPost({ uid: uid }, { id: id }),
+				{ message: '[[error:no-post]]' },
+			);
+		});
+
 		it('should prevent regular users from approving posts', async () => {
+			// Restricted and missing queue entries respond identically (no existence oracle)
 			await assert.rejects(
 				apiPosts.acceptQueuedPost({ uid: uid }, { id: queueId }),
-				{ message: '[[error:no-privileges]]' },
+				{ message: '[[error:no-post]]' },
 			);
 		});
 
@@ -1192,6 +1221,18 @@ describe('Post\'s', () => {
 			const { body } = await request.get(`${nconf.get('url')}/post-queue/${result.id}`, { jar });
 			// should not contain the translated message
 			assert(body.indexOf('Perhaps you should') === -1);
+		});
+
+		it('should merge notifications for multiple queued posts from the same user', async () => {
+			const queueUid = await user.create({ username: 'queuemerger' });
+			await apiTopics.reply({ uid: queueUid }, { content: 'first queued reply', tid: topicData.tid });
+			await sleep(5);
+			await apiTopics.reply({ uid: queueUid }, { content: 'second queued reply', tid: topicData.tid });
+			await sleep(2000);
+
+			const { unread } = await user.notifications.get(globalModUid);
+			const queued = unread.filter(n => n && n.type === 'post-queue' && n.mergeId && n.mergeId.endsWith(`-uid-${queueUid}`));
+			assert.strictEqual(queued.length, 1);
 		});
 	});
 
@@ -1390,6 +1431,71 @@ describe('Post\'s', () => {
 
 			const { groups: groupNames } = await socketPosts.getEditors({ uid: ownerUid }, { pid: pid });
 			assert.deepStrictEqual(groupNames, []);
+		});
+	});
+
+	describe('editing posts in locked topics', () => {
+		let ownerUid;
+		let pid;
+
+		before(async () => {
+			ownerUid = await user.create({ username: 'locked topic owner' });
+			const topic = await topics.post({
+				uid: ownerUid,
+				cid,
+				title: 'a topic that gets locked',
+				content: 'Some text here for the OP',
+			});
+			pid = topic.postData.pid;
+			await topics.setTopicField(topic.topicData.tid, 'locked', 1);
+		});
+
+		it('should not allow the owner to edit a post in a locked topic', async () => {
+			const { flag, message } = await privileges.posts.canEdit(pid, ownerUid);
+			assert.strictEqual(flag, false);
+			assert.strictEqual(message, '[[error:topic-locked]]');
+		});
+
+		it('should let a plugin grant edit access by unsetting isLocked', async () => {
+			const method = (data) => {
+				assert.strictEqual(data.isLocked, true);
+				data.isLocked = false;
+				return data;
+			};
+			plugins.hooks.register('test-edit-locked', {
+				hook: 'filter:privileges.posts.edit',
+				method: method,
+			});
+			try {
+				const { flag } = await privileges.posts.canEdit(pid, ownerUid);
+				assert.strictEqual(flag, true);
+			} finally {
+				plugins.hooks.unregister('test-edit-locked', 'filter:privileges.posts.edit', method);
+			}
+		});
+
+		it('should not allow the owner to delete a post in a locked topic', async () => {
+			const { flag, message } = await privileges.posts.canDelete(pid, ownerUid);
+			assert.strictEqual(flag, false);
+			assert.strictEqual(message, '[[error:topic-locked]]');
+		});
+
+		it('should let a plugin grant delete access by unsetting isLocked', async () => {
+			const method = (data) => {
+				assert.strictEqual(data.isLocked, true);
+				data.isLocked = false;
+				return data;
+			};
+			plugins.hooks.register('test-delete-locked', {
+				hook: 'filter:privileges.posts.delete',
+				method: method,
+			});
+			try {
+				const { flag } = await privileges.posts.canDelete(pid, ownerUid);
+				assert.strictEqual(flag, true);
+			} finally {
+				plugins.hooks.unregister('test-delete-locked', 'filter:privileges.posts.delete', method);
+			}
 		});
 	});
 

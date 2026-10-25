@@ -289,6 +289,22 @@ describe('Groups', () => {
 			const isMembers = await Groups.isMemberOfGroups(-1, ['guests', 'registered-users', 'spiders']);
 			assert.deepStrictEqual(isMembers, [false, false, true]);
 		});
+
+		it('should work for group names that start with a 0/-1', async () => {
+			const groupName = '0group';
+			await Groups.create({
+				name: groupName,
+				description: 'group that starts with a 0',
+			});
+			await Groups.join(['parentgroup'], groupName);
+			const [member] = await db.getSortedSetRevRange(`group:parentgroup:members`, 0, -1);
+			assert.strictEqual(member, groupName);
+			assert.strictEqual(await Groups.isMember(groupName, 'parentgroup'), true);
+			assert.deepStrictEqual(await Groups.isMemberOfGroups(groupName, ['parentgroup']), [true]);
+			assert.deepStrictEqual(await Groups.isMembers([groupName], 'parentgroup'), [true]);
+			assert.deepStrictEqual(await Groups.isMembers([groupName], 'guests'), [false]);
+			assert.deepStrictEqual(await Groups.isMembers(['-1something'], 'spiders'), [false]);
+		});
 	});
 
 	describe('.isMemberOfGroupList', () => {
@@ -644,6 +660,54 @@ describe('Groups', () => {
 			isMember = await Groups.isMember(uid, 'registered-users');
 			assert(isMember);
 		});
+
+		describe('public chat rooms restricted to the group', () => {
+			const messaging = require('../src/messaging');
+			let memberUid;
+			let outsiderUid;
+
+			before(async () => {
+				memberUid = await User.create({ username: 'destroyed-group-member' });
+				outsiderUid = await User.create({ username: 'destroyed-group-outsider' });
+			});
+
+			async function createRoomFor(groupName, groupNames) {
+				await Groups.create({ name: groupName });
+				await Groups.join(groupName, memberUid);
+				const roomId = await messaging.newRoom(adminUid, {
+					type: 'public',
+					roomName: utils.generateUUID(),
+					groups: groupNames,
+				});
+				await messaging.loadRoom(memberUid, { roomId });
+				await messaging.sendMessage({ uid: memberUid, roomId, content: 'restricted history' });
+				return roomId;
+			}
+
+			it('should not let a new group with the same name into the room', async () => {
+				const roomId = await createRoomFor('destroyed-room-group', ['destroyed-room-group']);
+				await Groups.destroy('destroyed-room-group');
+				await Groups.create({ name: 'destroyed-room-group', ownerUid: outsiderUid });
+
+				assert.strictEqual(await messaging.loadRoom(outsiderUid, { roomId }), null);
+				const { groups } = await messaging.getRoomData(roomId);
+				assert.deepStrictEqual(groups, ['administrators']);
+			});
+
+			it('should remove members who no longer have access', async () => {
+				const roomId = await createRoomFor('destroyed-room-group-2', ['destroyed-room-group-2']);
+				await Groups.destroy('destroyed-room-group-2');
+				assert.strictEqual(await messaging.isUserInRoom(memberUid, roomId), false);
+			});
+
+			it('should keep the room\'s other groups', async () => {
+				await Groups.create({ name: 'surviving-room-group' });
+				const roomId = await createRoomFor('destroyed-room-group-3', ['destroyed-room-group-3', 'surviving-room-group']);
+				await Groups.destroy('destroyed-room-group-3');
+				const { groups } = await messaging.getRoomData(roomId);
+				assert.deepStrictEqual(groups, ['surviving-room-group']);
+			});
+		});
 	});
 
 	describe('.join()', () => {
@@ -856,6 +920,44 @@ describe('Groups', () => {
 
 					done();
 				});
+			});
+		});
+
+		describe('public chat rooms restricted to groups', () => {
+			const messaging = require('../src/messaging');
+			let uid;
+
+			async function createRoomFor(groupNames) {
+				const roomId = await messaging.newRoom(adminUid, {
+					type: 'public',
+					roomName: utils.generateUUID(),
+					groups: groupNames,
+				});
+				await messaging.loadRoom(uid, { roomId });
+				assert(await messaging.isUserInRoom(uid, roomId));
+				return roomId;
+			}
+
+			before(async () => {
+				uid = await User.create({ username: 'public-room-leaver' });
+				await Groups.create({ name: 'room-group-a' });
+				await Groups.create({ name: 'room-group-b' });
+			});
+
+			beforeEach(async () => {
+				await Groups.join(['room-group-a', 'room-group-b'], uid);
+			});
+
+			it('should remove the user from a room they can no longer enter', async () => {
+				const roomId = await createRoomFor(['room-group-a']);
+				await Groups.leave('room-group-a', uid);
+				assert.strictEqual(await messaging.isUserInRoom(uid, roomId), false);
+			});
+
+			it('should keep the user in a room another of their groups still lets them into', async () => {
+				const roomId = await createRoomFor(['room-group-a', 'room-group-b']);
+				await Groups.leave('room-group-a', uid);
+				assert.strictEqual(await messaging.isUserInRoom(uid, roomId), true);
 			});
 		});
 	});
@@ -1487,9 +1589,9 @@ describe('Groups', () => {
 		it('should fail to upload group cover with invalid image', (done) => {
 			const data = {
 				groupName: 'Test',
-				imageData: 'data:image/svg;base64,iVBORw0KGgoAAAANSUhEUgAAABwA',
+				imageData: 'data:image/svg;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEAAUAmJaQAA3AA/v89WAAAAA==',
 			};
-			socketGroups.cover.update({ uid: adminUid }, data, (err, data) => {
+			socketGroups.cover.update({ uid: adminUid }, data, (err) => {
 				assert.equal(err.message, '[[error:invalid-image]]');
 				done();
 			});

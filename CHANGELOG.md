@@ -1,70 +1,568 @@
+#### v4.16.3 (2026-10-14)
+
+##### Chores
+
+*  up 2factor (8a2f1a44)
+*  up spam-be-gone (6b932381)
+
+##### New Features
+
+*  add an ip lockout to loginAttempts (780dd79e)
+
+##### Bug Fixes
+
+*  chat list search ignores the uid of the chats page being viewed (#15001) (1fc9d42a)
+*  inconsistent sort order and stale results in user list search (#15000) (e4682ff8)
+*  unread notification count includes notifications hidden from the list (#14997) (3a613d2e)
+*  post queue self approve via cid modification (7864331e)
+*  add wasForceLogin check to sso logins as well (c666586e)
+* **activitypub:**
+  *  serve federated emoji with nosniff/attachment headers (db3581d4)
+  *  require completed handshake for relay trust (2b76bc12)
+* **topics:**  check target category privileges for remote authors (58e565d4)
+
+##### Refactors
+
+*  use topic.cid and check for falsy values (d3eecfb0)
+*  move wasForceLogin into doLogin (a32faf0f)
+
+#### v4.16.2 (2026-10-05)
+
+##### Bug Fixes
+
+* **activitypub:**  harden emoji cache against path traversal and SSRF (0832880a)
+
+#### v4.16.1 (2026-10-02)
+
+##### Chores
+
+*  up persona (2b63bec8)
+*  up markdown (260a0ccd)
+*  up mentions 2factor (fef7f796)
+*  up webpush (7867e960)
+*  up themes (51d308c4)
+*  up harmony (20623201)
+*  clear 404 log everyday (d6b9b148)
+*  up harmony (aa5323b9)
+*  up markdown, ignore ? in image paths (03e0e449)
+*  up themes (4cdc1335)
+*  fix lint (c7635712)
+*  say when an admin route has no privilege mapped to it (#14874) (e475530b)
+*  up spam-be-gone (9aec1804)
+*  up emoji (18a95dc6)
+
+##### Documentation Changes
+
+*  document missing chat room create and update fields (#14908) (77d9604a)
+
+##### New Features
+
+*  let plugins map admin routes to privileges from static:privileges.admin.init (#14891) (527b8687)
+*  generic bodyShort for merged notifications with a plugin-registered mergeId (#14886) (d3c5e1d5)
+*  warn in the dashboard when a proxy is in front of an untrusting NodeBB (#14872) (3f479e8d)
+*  let plugins take part in notification merging (#14843) (6c9f017b)
+*  add a write API route for custom user fields (#14840) (39910850)
+
+##### Bug Fixes
+
+*  category moderators see an empty post queue (#14943) (87f90bb3)
+*  closes #14942, fix undefined attachment (85a9892c)
+*  closes #14926, create indices when converting objects table (#14928) (2cd36780)
+*  update nodemailer and fix services (247b69b0)
+*  closes #14919, ignore @ suffixes in upload paths (6c82eec2)
+*  closes #14896, fix old user profile pictures (043e173d)
+*  category names not being translated in topic events (aa83b633)
+*  quote tooltip leaked into topics without reply privilege (#14910) (62a7c611)
+*  changing a public room's groups left members who lost access in the room (#14906) (6cdb54b9)
+*  chat unread pushes kept going to the room's old members (#14905) (3e53f1ae)
+*  rtlcss ignore directives were stripped before rtl processing (#14907) (ac21ac78)
+*  trigger reauth prompt on 401 status instead of translated message (#14914) (2ceb292f)
+*  only administrators and admin:users holders handle user flags (#14890) (b9121aab)
+*  deleting a group left public chat rooms restricted to its name (#14902) (7c232f6a)
+*  leaving a group removed users from the wrong public chat rooms (#14900) (6c4ecd3d)
+*  remove itemprop="image" from buildAvatar (a5ef5103)
+*  closes #14894, services moved to a nested object (ad40ff63)
+*  chat message flag notifications went to global moderators (#14888) (97de7b82)
+*  don't delete a tag when renaming it to a name that cleans up to itself (#14885) (d5376a0e)
+*  merge notifications that share a mergeId with no differentiator (#14871) (bd0b2535)
+*  translate name of custom fields like [[user:website]] [[user:location]] etc (99397176)
+*  merge notifications for flags on the same chat message (#14866) (a8d93e12)
+*  give merged post-queue notifications their own text (#14865) (593a71e1)
+*  merged user flag notifications show the flagged user (#14864) (e3cddfbc)
+*  apply the default email payload and text direction in sendToEmail (#14863) (97c0f022)
+*  bump 2factor (52297333)
+*  three ways a custom profile field could not be saved (#14846) (974fefd7)
+*  selection tooltip positioned offscreen for selections in code blocks (#14849) (a553d8bc)
+*  post queue notifications never merged (#14842) (15ef3719)
+*  allow one flag more per day than the configured limit (#14838) (5af369ac)
+*  drop the filename when an uploaded file has no extension (#14839) (17b202f9)
+*  match registration queue entries against unnormalised IPs (#14837) (b8d9cf9d)
+*  flag history labelled registration details as username/email changes (#14836) (572bb42f)
+*  unassigning a flag showed "Guest" as the new assignee (#14834) (a671ee20)
+* **activitypub:**  normalize non-array tag from remote actors in mocks (770037e9)
+* **security:**
+  *  reject array cid in createTopicFromPosts moderator gate (2be4c5c4)
+  *  apply CSRF protection to the v3 JSON login route (d48df6d7)
+  *  close post-queue existence oracle and bodyless DELETE crash (251e7bfa)
+  *  return 404 instead of 403 for restricted topics/posts/feeds (b5fb06ac)
+* **categories:**  hide disabled categories from non-admins in get (88847e64)
+* **uploads:**  normalize post upload paths before storing and hashing (77944ac2)
+* **socket.io:**  always provide a callback for empty payloads (187c22e2)
+
+##### Other Changes
+
+*  cache: fix key/enabled check for toggles (#14921) (e6d7672d)
+
+##### Refactors
+
+*  add  rejectUnauthorized support (1976827b)
+*  use the same style on group names in dropdown (4f4b1f28)
+*  flag assignment checks the same rule as flag access (#14889) (08f6f054)
+*  one owner for the email cancel gate (#14873) (58e1d449)
+*  one owner for the sortable ACP list editors (#14867) (3f1fbc62)
+*  one owner for db-backed rate limit counters (#14868) (dfb22b76)
+*  one owner for custom user field value parsing (#14862) (eb0f0eca)
+*  one owner for the custom user field type rules (#14860) (3757db29)
+*  one owner for the custom user field keys (#14853) (89e6b358)
+*  one client ip helper for both transports (#14844) (54ae3cc5)
+
+##### Tests
+
+*  update assertions for oracle-closing status changes (34b5c915)
+
+#### v4.16.0 (2026-09-16)
+
+##### Chores
+
+*  up spam-be-gone (3861ee1a)
+*  up spam-be-gone, check response of edit email call (7a8e3a48)
+*  eslint fixes (ac4413e2)
+*  remove comment (9dc3970c)
+*  add OpenAPI schemas for hashtag admin endpoints (5c160805)
+*  remove log (1dbf9895)
+*  up harmony (7f43dbee)
+*  up spam-be-gone (a5d2eae9)
+*  up themes (51e51762)
+*  up themes (a107490b)
+*  remove debug logs (d8f481a7)
+*  remove extraneous logging (8169094f)
+*  remove APSEND.md (d9985487)
+*  up harmony (d507dae4)
+* **i18n:**
+  *  fallback strings for new resources: nodebb.admin-settings-user, nodebb.admin-settings-post (20662baf)
+  *  fallback strings for new resources: nodebb.admin-menu, nodebb.admin-settings-activitypub (3dfa70ea)
+  *  fallback strings for new resources: nodebb.error (a3e35fc7)
+  *  fallback strings for new resources: nodebb.admin-settings-activitypub (b50e031d)
+  *  fallback strings for new resources: nodebb.admin-settings-activitypub (529afcb0)
+  *  fallback strings for new resources: nodebb.admin-settings-activitypub (35156eb9)
+  *  fallback strings for new resources: nodebb.topic (9fcdfb9e)
+  *  fallback strings for new resources: nodebb.admin-settings-activitypub (f4b02113)
+  *  fallback strings for new resources: nodebb.admin-settings-tags (dcfdc606)
+  *  fallback strings for new resources: nodebb.admin-settings-activitypub (8d9d2f4e)
+  *  fallback strings for new resources: nodebb.admin-settings-reputation, nodebb.error, nodebb.flags, nodebb.notifications (1683c737)
+  *  fallback strings for new resources: nodebb.admin-settings-notifications (952c69f0)
+  *  fallback strings for new resources: nodebb.tags, nodebb.topic (6792030f)
+  *  fallback strings for new resources: nodebb.admin-manage-privileges, nodebb.email (cb4e2840)
+  *  fallback strings for new resources: nodebb.topic (d66bb3ec)
+* **deps:**
+  *  update dependency smtp-server to v3.19.13 (#14826) (c1d97397)
+  *  update dependency smtp-server to v3.19.12 (#14815) (c1f133f9)
+  *  update dependency sass-embedded to v1.104.1 (#14813) (17984ec8)
+  *  update dependency smtp-server to v3.19.11 (#14811) (5e6f0335)
+  *  update dependency mocha to v12.0.1 (03425906)
+  *  update dependency smtp-server to v3.19.10 (#14799) (5e6ff3b3)
+  *  update dependency lint-staged to v17.5.1 (#14798) (b750a680)
+  *  update dependency smtp-server to v3.19.9 (#14774) (6439acbb)
+  *  update dependency smtp-server to v3.19.8 (#14768) (7f0f3fcb)
+  *  update dependency lint-staged to v17.5.0 (#14764) (10db09e9)
+  *  update dependency sass-embedded to v1.104.0 (#14756) (6561da59)
+  *  update dependency smtp-server to v3.19.7 (#14730) (bfc276a6)
+  *  update dependency globals to v17.12.0 (#14728) (4400d92f)
+  *  update dependency smtp-server to v3.19.5 (#14718) (609594bf)
+  *  update dependency smtp-server to v3.19.4 (#14696) (e031f93b)
+  *  update dependency lint-staged to v17.4.1 (#14692) (d167d247)
+  *  update redis docker tag to v8.10.1 (#14646) (d95d978c)
+  *  update dependency sass-embedded to v1.103.1 (#14650) (fe87608d)
+  *  update postgres docker tag to v18.6 (#14612) (5c21d4ef)
+  *  update commitlint monorepo to v21.2.2 (#14610) (7893ac47)
+  *  update dependency sass-embedded to v1.102.0 (#14606) (cc63c383)
+* **activitypub:**  remove legacy retry cron and _sendMessage (phase 4)\n\n- Remove ap:retry:send cron job and retryFailedMessages() from jobs.js\n- Remove _sendMessage() from index.js (all sends now go through SendPool)\n- Update APSEND.md with phase 4 findings\n\nAssisted-by: unsloth/Qwen3.6-35B-A3B-GGUF (4bbaea5f)
+
+##### New Features
+
+*  allow admins to hide topic event types (#14824) (f2c968e9)
+*  add Messaging.isRoomMember() (#14779) (18925527)
+*  add action:messaging.markRead hook with previous read timestamp (#14777) (fcaeec1b)
+*  update chat room url with message index on scroll (#14738) (040b9967)
+*  mark flag notifications read when the flag detail page is viewed (#14747) (4d155cc9)
+*  expose category privilege copying via v3 API (#14670) (6203ebc9)
+*  add full name to ACP user search (#14671) (4700ccb5)
+*  hint when follow notifications are disabled (#14666) (a7cc7f42)
+* **activitypub:**
+  *  include contentWarning in post summaries and teasers (bfabeba6)
+  *  include contentWarning in feed post data (c1636f4c)
+  *  hide content and thumbs behind CW in templates (0b3433eb)
+  *  support content warnings on incoming remote posts (c968c281)
+  *  add category selector to hashtag follow, fix actor assertion (fea80171)
+  *  add global hashtag follow feature (4e22def3)
+  *  enable instance actor to follow remote actors (deeeb3d4)
+  *  verify incoming rfc 9421 signatures (872c6178)
+  *  sign activities with rfc 9421, fall back to draft (32494377)
+  *  render remote emoji in actor names (d0cbe18d)
+  *  render custom emoji in topic titles (44ca8f46)
+  *  re-download stale emoji on serve (379f4bb7)
+  *  hostname-aware custom emoji cache and proxy (f7376eab)
+  *  allow plugins to handle incoming AP activities via plugin hook (2bf93aa9)
+  *  announce bumped topics to followers (16d3f6d6)
+  *  add staged delivery for topic replies (c3003933)
+  *  log send pool failures via analytics.sendError (94b1ad5d)
+  *  add allowList to ssrf.js for hostname whitelisting (711f2275)
+  *  implement send worker child process for offloaded federation (664c9bb9)
+* **flags:**  support remote flag forwarding for chat messages (8462ac86)
+* **federation:**  add activities-by-type pie chart to analytics page (b23912c0)
+* **tags:**  add case-sensitive tag support with caseSensitiveTags config (#14690) (883c2175)
+
+##### Bug Fixes
+
+* **messaging:**  skip existing members in addUidsToRoom to preserve join timestamps (f34e2e8c)
+* **deps:**
+  *  update dependency cronstrue to v3.27.0 (#14832) (da569d73)
+  *  update dependency proxy-addr to v2.0.8 (#14827) (1f60aa10)
+  *  update dependency autoprefixer to v10.6.1 (#14831) (8b384e79)
+  *  update dependency nodemailer to v10.0.10 (#14822) (1c2a1364)
+  *  update dependency multer to v2.4.0 (#14821) (4afddc26)
+  *  update dependency webpack to v5.111.0 (#14820) (f11e4ff1)
+  *  update dependency express to v4.22.3 (#14819) (0e8cc9cb)
+  *  update dependency autoprefixer to v10.6.0 (#14817) (f7a75b6b)
+  *  update dependency nodemailer to v10.0.9 (#14814) (8f73fb18)
+  *  update dependency sass to v1.104.1 (#14816) (54c29509)
+  *  update dependency nodemailer to v10.0.8 (#14812) (0c0e3886)
+  *  update dependency nodemailer to v10.0.7 (cc5caafc)
+  *  update dependency file-type to v22.1.0 (8f16415d)
+  *  update dependency morgan to v1.12.1 (#14807) (23e0e246)
+  *  update dependency compression to v1.8.2 (#14806) (ee7350da)
+  *  update dependency nodemailer to v10.0.3 (#14802) (2439f8fe)
+  *  update dependency cronstrue to v3.26.0 (#14803) (0cce8eeb)
+  *  update dependency autoprefixer to v10.5.6 (#14800) (e4b6c08a)
+  *  update dependency nodemailer to v10.0.2 (#14795) (cc115328)
+  *  update dependency minimizer-webpack-plugin to v5.10.1 (#14792) (3293ffb6)
+  *  update dependency cronstrue to v3.25.0 (#14782) (af76becd)
+  *  update dependency nodemailer to v10.0.1 (#14773) (29bdae4d)
+  *  update dependency minimizer-webpack-plugin to v5.10.0 (#14770) (89770faf)
+  *  update dependency nodebb-plugin-composer-default to v11.0.16 (#14726) (b3ddf9a6)
+  *  update dependency nodebb-widget-essentials to v8.0.10 (#14767) (681987ec)
+  *  update dependency nodebb-plugin-2factor to v8.0.9 (#14705) (f1241c63)
+  *  update dependency nodemailer to v10 (#14758) (38232e45)
+  *  update dependency nodebb-plugin-web-push to v0.9.5 (#14761) (c47bcb4d)
+  *  update dependency nodebb-plugin-emoji to v6.0.17 (#14763) (d977ae18)
+  *  update dependency nodebb-plugin-mentions to v5.0.4 (#14760) (2d2e31ed)
+  *  update dependency autoprefixer to v10.5.5 (#14759) (239342d5)
+  *  update dependency undici to v8.10.2 (#14762) (9a42dffd)
+  *  update dependency sass to v1.104.0 (#14757) (7e29ba8d)
+  *  update dependency postcss to v8.5.28 (#14754) (48381a1e)
+  *  update themes for #14751 (efa8ba30)
+  *  update dependency postcss to v8.5.27 (#14749) (a7c35b7f)
+  *  update dependency minimizer-webpack-plugin to v5.9.0 (#14750) (e9e91758)
+  *  update dependency nodemailer to v9.1.1 (#14731) (bc7b28fa)
+  *  update dependency webpack to v5.110.3 (#14733) (6b0d463e)
+  *  update dependency nodebb-plugin-web-push to v0.9.4 (#14723) (4fecdce2)
+  *  update dependency nodemailer to v9.1.0 (#14720) (109a3a8d)
+  *  update dependency undici to v8.10.1 (#14719) (d255fc53)
+  *  update dependency webpack to v5.110.2 (#14713) (f252e519)
+  *  update dependency webpack to v5.110.1 (#14701) (df263644)
+  *  update dependency morgan to v1.12.0 (#14704) (b63f488b)
+  *  update dependency multer to v2.3.0 (#14707) (dccb81bf)
+  *  update dependency nodemailer to v9.0.6 (#14695) (6fb590f5)
+  *  update dependency webpack to v5.110.0 (#14526) (0b539b2c)
+  *  update dependency minimizer-webpack-plugin to v5.8.0 (#14688) (b15f8191)
+  *  update dependency sharp to v0.35.4 (#14685) (61dff4f2)
+  *  update dependency mongodb to v7.6.0 (#14679) (0ef58d3c)
+  *  update dependency satori to v0.33.4 (#14675) (19f0b01d)
+  *  update dependency cropperjs to v1.6.3 (#14662) (88ab1db6)
+  *  update dependency express-useragent to v2.2.3 (#14656) (eff4fed0)
+  *  update dependency satori to v0.33.3 (#14655) (b7610738)
+  *  update dependency satori to v0.33.2 (#14652) (556050d7)
+  *  update dependency satori to v0.33.0 (#14647) (22f7d43d)
+  *  update dependency sass to v1.103.1 (#14649) (0f48fad5)
+  *  update dependency satori to v0.32.0 (#14645) (07d74373)
+  *  update dependency sass to v1.103.0 (#14642) (0814cd5a)
+  *  update dependency satori to v0.29.1 (#14638) (ba9c8446)
+  *  update dependency html-to-text to v10.0.1 (#14637) (33afbb88)
+  *  update dependency file-type to v22.0.2 (#14617) (3adb2d5e)
+  *  update dependency express-useragent to v2.2.2 (#14613) (1550606e)
+  *  bump harmony (77876289)
+  *  update dependency sanitize-html to v2.17.7 (#14611) (dc9c768d)
+* **activitypub:**
+  *  require author for federated chat message edit/delete (e717c3e9)
+  *  cross-check signature against verified keyId, not raw header (fc282318)
+  *  announce dereferenceable objects to relays (7abe2528)
+  *  improve RFC 9421 interoperability (a57eb6e5)
+  *  resolve string URIs and use resolveLocalId in inbox.flag (46ae1cea)
+  *  skip undo.announce for pseudo-category cid -1 (38052864)
+  *  return true from assert/assertGroup when all IDs already present (89d3d964)
+  *  move fallback warning from worker to orchestrator (ef860a33)
+  *  handle FediBuzz Accept with actor document as object (40ca8efc)
+  *  add stateClass to Hashtags.list() for API consumers (1ad70560)
+  *  parse createdAt as number in hashtag records (d758fbe3)
+  *  limit activity dedup window to 10s (8f7471c3)
+  *  use RFC 9421 registered algorithm identifiers in Signature-Input header (c5dc224e)
+  *  correct assertion check in Out.follow (57095a45)
+  *  correct assertion check in Out.follow (a0fdef70)
+  *  use request protocol for rfc 9421 target uri (203e9a91)
+  *  accept Content-Digest (RFC 9530) for Mitra compatibility (6190b45c)
+  *  add required algorithm parameter to RFC 9421 Signature-Input header (bce41a39)
+  *  reconstruct rfc 9421 target uri from host header (b49186b5)
+  *  emit rfc 9421 signatures as rfc 8941 byte sequences (bb199f45)
+  *  gate user-facing S2S endpoints on fediverse view:users privilege (f0368a2f)
+  *  normalize webfinger cache keys and search handles (958cd2d6)
+  *  harden split-domain vouching and self-link fallback (934ad5ee)
+  *  harden webfinger query input validation (d6f95f14)
+  *  prevent cross-domain webfinger cache poisoning (60c6333f)
+  *  re-apply federation policy on redirect destinations (6c4692b7)
+  *  route unhandled resource types through outgoing warning page (634fb152)
+  *  validate webfinger content-type before parsing (be5f09a3)
+  *  accept same-domain legacy actors via self-link fallback (6cca6a41)
+  *  use sensible min/max worker counts (1d857512)
+  *  handle unhandled rejections in handleResult and add .unref() to force-kill timer (18bdab7c)
+  *  repair send pool drain loop and worker sizing (ce0765fe)
+  *  add User-Agent header to fetch requests\n\n- Match NodeBB/request.js format: NodeBB/x.x.x (site-url)\n- Prevents remote servers from rejecting requests as bots\n\nAssisted-by: unsloth/Qwen3.6-35B-A3B-GGUF (634cb7d4)
+  *  export SendPool on ActivityPub module for test access\n\nAssisted-by: unsloth/Qwen3.6-35B-A3B-GGUF (bbab962f)
+  *  fix handleWorkerExit bug and fix sendWorker tests\n\n- Fix handleWorkerExit accessing task.queueId when task is undefined\n- Export SendPool on ActivityPub module for test access\n- Rewrite sendPool.js tests: reset state between tests, avoid shared worker state\n- Rewrite sendWorker.js tests: fix exit code expectations, remove unreliable tests\n\nAssisted-by: unsloth/Qwen3.6-35B-A3B-GGUF (343b96b5)
+  *  refactor send pool into send.js and fix critical bugs (612e8213)
+*  registration approval queue link in ACP user settings (#14825) (4688978a)
+*  filter fork topic events by category find privilege (#14823) (0af568a5)
+*  fall back to en-GB for untranslated strings (#14829) (3f3f85cc)
+*  translate plugin-supplied labels on the registration queue (#14830) (059bccc7)
+*  upgrade progress for system-message upgrade script (8f5ecab6)
+*  fire pluginHooks for /compose (2d15e006)
+*  fire pluginHooks for /compose (4b666b87)
+*  scroll chat/notification dropdowns to top when a new item arrives (#14776) (1c636334)
+*  don't show new posts alert on topic lists for the user's own posts (#14818) (2a2cf375)
+*  do not federate crossposts to private targets (3a6b81fb)
+*  bump themes for #14794 (d0dd90b4)
+*  broken tpl in feed/item.tpl (92e4f805)
+*  prevent caching of responses carrying a CSRF token (#14787) (47e38583)
+*  add hashtag schemas to OpenAPI manifests (fb38d0fa)
+*  closes #14765 (8f5f105f)
+*  load zxcvbn lazily so password forms keep working when the chunk fails to load (#14791) (1478c95f)
+*  prune expired topic view timestamps from the session (#14789) (a21aaf17)
+*  ask for the current password when an admin changes their own password from ACP (#14790) (6b47ea82)
+*  hide "none found" notice on trending plugins tab when plugins exist (#14785) (edc15e5e)
+*  use parent category as up link, closes #14784 (e661c60f)
+*  don't splice the viewer's own chat room into another user's room list (#14781) (86827de3)
+*  keep the server timestamp on live chat messages (#14778) (2f3df9ca)
+*  bump emoji plugin (c0921855)
+*  browser title rendered LTR for RTL users when the page title starts with Latin text (#14780) (561de8a4)
+*  register template helpers before ajaxify can render a page (#14775) (c2da26f1)
+*  only allow sort by flags for privileged users (9af2e8b8)
+*  dont allow sorting by email in user search (dba251ba)
+*  show which login field is missing instead of a generic error (#14772) (b1559700)
+*  on notifications page don't show counts if post notifications are not visible (0290c45b)
+*  category/tag filter dropdown taller than the viewport (#14769) (3391a3d9)
+*  filter out notifications that are from pids that are (3bfdf622)
+*  during post creation don't use posts.uploads.sync (1e490426)
+*  unread/flags nav counts not rendered when relative_path is set (#14755) (7457d23e)
+*  enforce response size during streaming and require Digest for inbox requests (cee29dc5)
+*  add one more escape for title (b8736936)
+*  add missing escape (92a7fd59)
+*  use new helper in topic and posts (0796f50c)
+*  include fullnameEmoji in key places in core (873d0277)
+*  escape attributes in renderShortcodeEmoji helper (7523dd7b)
+*  bump themes for #14748 (e371cbee)
+*  closes #14743, handle uid groupnames in isMember methods (c1081a0c)
+*  issue where wrong cid was passed in when remote uid was posting to remote cid, fixes regression caused by 6f5607e0b7f670ac6ee1ab5f9c24591d8a4d9c95 (eadc8e29)
+*  remove extraneous comments (aaff6c07)
+*  lang keys (42f5f46a)
+*  add missing dep (d2fee2b8)
+*  lint (8ef4b72a)
+*  regressed tests due to webfinger strictness checks (8b008cdf)
+*  fallbacks, manually executed (c20d2e85)
+*  use thread instead of process for AP workerpool config (301f7c7b)
+*  update maxWorkers strategy to set up more workers per CPU as AP is mostly network-bound. Previous was 1-per CPU (min 1); now using os.availableParallelism() * 2 (a0fa2456)
+*  debug logs (e8b94750)
+*  match the same icon in topic.tpl for merge (419ef355)
+* **security:**
+  *  harden login timing, user status, and groupTitle (d271e20c)
+  *  harden login timing, user status, and groupTitle (12860ab5)
+* **flags:**  support remote actor URIs in Flags.rescindReport (d111ae86)
+* **auth:**  #14793, clear forceLogin before session regeneration to prevent double re-login challenge (40fc44fa)
+* **test:**
+  *  assert relative localPath in getEmoji test (59139cc9)
+  *  adjust ActivityPub privilege tests for remote uid/cid checks (aeb0a3e6)
+* **federation:**  resolve analytics lint errors (#14703) (ce136e06)
+* **activitypub/jobs:**  only run drainLoop on primary process (5c5dc763)
+* **admin/federation:**  add pie chart, no-data state, and legend spacing to analytics (0eda2d6b)
+
+##### Performance Improvements
+
+*  dont map twice for keys (4d6379d1)
+*  dont stringify unused value (59872135)
+*  use a single filterUids (3b76bf79)
+*  use index and get watching and everything above (e065409f)
+
+##### Refactors
+
+*  remove deprecated chat socket.io methods (a2aa265b)
+*  change worker count (883953d3)
+*  dont log timestamp parse error (7ca81b45)
+*  new topic notification (708ccddc)
+*  remove postcss-clean (d1ee699f)
+*  add invalidationVersions to cache dumps (3bd3685b)
+*  dont promisify pluginHooks already async (6d4b0ec6)
+*  update lru/ttl cache to use a version map (#14786) (4828d899)
+*  update swagger parser to 13.0.0 (#14771) (e683f0fb)
+*  load read & unread notifs parallel (009912ca)
+*  use uid from postData for isPostOwner check (9aa0e6c6)
+*  load tid once (98cb2582)
+* **activitypub:**
+  *  simplify hashtag follow to use Out.follow (28a85299)
+  *  use Signatures.sign in sendWorker instead of custom signing (4181b3d5)
+  *  replace bespoke worker pool with workerpool (5eeeb9dc)
+  *  use ssrf.js for DNS rebinding protection in sendWorker (f15db030)
+* **request:**  extract SSRF and DNS rebinding protection into standalone ssrf.js module (2b3e3fb6)
+
+##### Tests
+
+* **activitypub:**
+  *  regression tests for inbox.delete topic ownership (7bf2e010)
+  *  stub webfinger requests to avoid 10s DNS timeouts (c5673a21)
+  *  eliminate outbound network calls from activitypub tests (748fec0e)
+  *  add unit tests for sendWorker and SendPool (phase 5)\n\n- Add sendWorker.js tests: IPC protocol, SSRF protection, timeout, crash\n- Add sendPool.js tests: lifecycle, dispatch, result, requeue, shutdown\n- Update APSEND.md with phase 5 findings\n\nAssisted-by: unsloth/Qwen3.6-35B-A3B-GGUF (03609b1a)
+*  one more psql test fix, save session after setting forceLogin=1 (661a467a)
+*  explicitly save session before redirecting (0f8a0603)
+*  increase timeout for tests (580ade9e)
+*  add logs to flaky register/abort test (cb461e98)
+*  move cache.del to after succesfull transaction complete (46c12b30)
+*  move cache.del to after query like other dbs (539a1f78)
+*  add some more debug to flaky test, submit agree-terms (624112f2)
+*  log failing response (284506de)
+*  increase timeout for tests (1f1bdede)
+*  wait for notifyCategoryFollowers to complete (ec0b066f)
+*  update build test (3c0051ed)
+*  fix spec (c7f80195)
+*  fix spec (f9553a5d)
+*  fix load topic title that's already passed to notification functions (43a1d59e)
+*  no idea  how this passes on CI, add missng awaits (3339e421)
+*  fix emoji AP test on windows (c4f949d0)
+*  add more info to flaky test (499df7dd)
+*  delete topic during post (d85c9cdd)
+*  remove log (f5a09832)
+*  log failing value (2ad7a538)
+*  add debug info to failing test (ee7b2874)
+*  fix messaging test, delete end point changed (dd3d8913)
+*  maybe fix category test (60657e16)
+
+#### v4.15.2 (2026-09-02)
+
+##### Chores
+
+*  up markdown (ec61c8d4)
+*  up deps (f333866e)
+*  up composer (74b04d20)
+*  up mocha, prevent crash in require.main (a8250d7c)
+*  up markdown/spam-be-gone (52351ee3)
+*  up qs (89a89ae7)
+*  bump deps for security fixes (c3d79173)
+*  up 2fa (fd835284)
+*  up 2factor (84ab4ee0)
+*  up 2factor (6133c3d8)
+*  up spam-be-gone (7bd760ae)
+*  pin dep (3f9abb6a)
+*  up jsdom (19bc2cc6)
+*  up harmony (3575369e)
+*  up markdown (af05b373)
+*  up compser (ab329b3b)
+*  up themes (5659302c)
+*  stop loading user signatures in topic lists (#14640) (766fb6aa)
+*  up markdown (1fccc981)
+
+##### Documentation Changes
+
+*  fix typo existance -> existence (#14708) (30b70ab4)
+
+##### New Features
+
+*  shift-click range selection when selecting posts (#14727) (f7668bd6)
+*  add filter:privileges.posts.delete, fired ahead of the lock gate (#14722) (8d9d0645)
+*  expose topic lock state to filter:privileges.posts.edit (#14710) (61126cc9)
+*  link pinned message timestamp to its place in the conversation (#14699) (8cb1be35)
+*  link chat reply quote timestamp to the quoted message (#14697) (90fc85da)
+*  show full category path on hover in category dropdowns (#14686) (0ea5c3dc)
+*  add missing object cache to psql similar to mongodb/redis (#14684) (4b93ab96)
+*  allow disabling all notification emails, closes #5644 (46ac1ee6)
+* **crossposts:**  reconcile stale sort scores on topic read (#14681) (aa52e783)
+
+##### Bug Fixes
+
+*  uid can be a groupname in groups.join/leave (857680ce)
+*  clean up active and orphaned tooltips on ajaxify transitions and chat modal actions (#14745) (3052ab03)
+*  closes #14743, handle uid groupnames in isMember methods (9999d1eb)
+*  keep a readable name on converted pasted images (#14735) (c443898c)
+*  closes #14729, handle purged topic/ deleted account (ec5503a4)
+*  add missing uid to getRaw, compare Strings (0cfa8308)
+*  closes #14717, add uid:<uid>:blocker_uids (85da0d17)
+*  hide deleted main post content on (2db21463)
+*  scope chat modal delete-room handler to room controls (#14714) (a2899e2d)
+*  do not expose raw content of deleted chat messages (#14709) (c5351fc7)
+*  revert skin regression (8b6ecbeb)
+*  use normalizeReturnToPath for redirect validation (d99545fa)
+*  restrict x-return-to to internal paths (67555b4b)
+*  closes #14702, helpers.redirect expects path to start with / (b4ebd4b0)
+*  validate theme id on admin.themes.set (24c9d560)
+*  retarget animated navigator scrolls after layout shifts (#14674) (5a76dfd9)
+*  anchor the assets/uploads strip in routeTouchIcon (#14694) (72f711e8)
+*  check upload folder containment in admin uploadFile (#14693) (12230a39)
+*  throw on invalid db during webinstall (7f5f0903)
+*  quick reply user status tooltip (63a542ce)
+*  #14691, fix selector up themes (8979c218)
+*  user profile age off by a few days due to fixed-length year math (#14687) (7d573372)
+*  scroll chats list to the active room (#14683) (50b616d9)
+*  hide imagedrop overlay when drag ends outside of it (#14682) (616c6aef)
+*  don't display crosspost button if user doesn't have privilege (0cd65312)
+*  apply saved search preferences immediately (#14665) (95e4f9fc)
+*  bring chat modal to front on interaction so overlapping chat modals stack correctly (#14663) (f7f7bf2e)
+*  only offer categories the user can crosspost to (e9cfa61f)
+*  sync client category watch states with core so unread badge updates for watching users (#14648) (77518451)
+*  topic filter dropdown opening in wrong direction on RTL (#14504) (35756dfa)
+*  update stale template path for search filters partial (#14643) (118c6c6c)
+*  return error instead of redirect for banned uid on token-authenticated requests, closes #12739 (#14639) (2c8379b7)
+* **activitypub:**
+  *  trim whitespace from signature parameter names in middleware reparses (038cc5a6)
+  *  filter soft-deleted and scheduled topics from outbox (c03de9e9)
+* **crossposts:**
+  *  pin and unpin the crossposted categories too (#14680) (4f293ab4)
+  *  pinned topics throw, tags unindexed, no bump on reply (#14658) (7403b018)
+
+##### Performance Improvements
+
+*  only hydrate chat rooms that match the search query (#14734) (9f0b3451)
+*  select uploads on the routes that render posts (#14654) (a2d19d34)
+*  use .some for better perf, no need to filter entire array (22962f49)
+
+##### Refactors
+
+*  only send to login if user has password (73035d5f)
+*  go to login when login timer expires (1eb8ace5)
+*  validate extensions first before processing upload (75e8771f)
+*  change schduled restore to happen first (f28200d5)
+*  if there are unread notifications open unread tab (bd21871c)
+*  follow up, clear cache on privilege change for crossposts (321df046)
+*  remove ttl on set, cache has it on init (86c9102e)
+
+##### Tests
+
+*  fix getRaw test, voterUid is the owner so need to use another uid (aed03040)
+*  move federate posts to after unpin (da30471e)
+*  cover root and subfolder return paths (4a1c33d2)
+*  await unpin (a9e2f69a)
+*  on fail log data (1ef1cf17)
+*  unpin after everything else (c2016090)
+
 #### v4.15.1 (2026-08-19)
 
 ##### Chores
 
 *  up harmony (67ed0109)
-*  incrementing version number - v4.15.0 (877b5a5a)
-*  update changelog for v4.15.0 (0ea59068)
-*  incrementing version number - v4.14.10 (41ae65ea)
-*  incrementing version number - v4.14.9 (95413895)
-*  incrementing version number - v4.14.8 (08009fe4)
-*  incrementing version number - v4.14.7 (7f7d881b)
-*  incrementing version number - v4.14.6 (07e2643d)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -133,21 +631,10 @@
 *  up themes (6c95dd0f)
 *  up themes (3092396c)
 *  up composer (a897e277)
-*  incrementing version number - v4.14.10 (41ae65ea)
-*  update changelog for v4.14.10 (8c14e037)
 *  up themes for 4.15.0 (33c16102)
-*  incrementing version number - v4.14.9 (95413895)
-*  incrementing version number - v4.14.8 (08009fe4)
-*  incrementing version number - v4.14.7 (7f7d881b)
-*  incrementing version number - v4.14.6 (07e2643d)
 *  up widgets (b0eb235d)
-*  incrementing version number - v4.14.5 (75f189f4)
 *  up link-preview (eca3765e)
-*  incrementing version number - v4.14.4 (c91bec41)
 *  rollback webpack (e843dbb2)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
 *  up web-push (6b4d4692)
 *  up webpush (a807e2d8)
 *  up themes (b5a3c2db)
@@ -159,56 +646,6 @@
 *  up lavender, widgets, fix translator test (3b9115b0)
 *  up lavender (968976c5)
 *  up themes, fix test helpers.escape no longer escapes tx tokens (c325c98d)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.uploads (5be859f9)
   *  fallback strings for new resources: nodebb.groups (ac3708b5)
@@ -477,69 +914,6 @@
 
 #### v4.14.10 (2026-08-11)
 
-##### Chores
-
-*  incrementing version number - v4.14.9 (95413895)
-*  update changelog for v4.14.9 (4835e462)
-*  incrementing version number - v4.14.8 (08009fe4)
-*  incrementing version number - v4.14.7 (7f7d881b)
-*  incrementing version number - v4.14.6 (07e2643d)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  closes #14580, dont send 'off' to digest.execute (5ad30d47)
@@ -555,65 +929,6 @@
 *  up mentions (a8bbd486)
 *  gitignore test output (c4ae3616)
 *  remove test output (c8af5ebb)
-*  incrementing version number - v4.14.8 (08009fe4)
-*  update changelog for v4.14.8 (f9c887b9)
-*  incrementing version number - v4.14.7 (7f7d881b)
-*  incrementing version number - v4.14.6 (07e2643d)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -696,64 +1011,6 @@
 ##### Chores
 
 *  up widgets (3ab34b9b)
-*  incrementing version number - v4.14.7 (7f7d881b)
-*  update changelog for v4.14.7 (954759df)
-*  incrementing version number - v4.14.6 (07e2643d)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -784,63 +1041,6 @@
 *  up persona (9792594d)
 *  up harmony (8c43a996)
 *  up themes (8f33cdd5)
-*  incrementing version number - v4.14.6 (07e2643d)
-*  update changelog for v4.14.6 (d0b17fbb)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -873,62 +1073,6 @@
 ##### Chores
 
 *  up themes, widgets (3fd456a1)
-*  incrementing version number - v4.14.5 (75f189f4)
-*  update changelog for v4.14.5 (b08460fc)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -951,61 +1095,6 @@
 
 *  up 2factor (036d4e4c)
 *  remove log (78b29ee5)
-*  incrementing version number - v4.14.4 (c91bec41)
-*  update changelog for v4.14.4 (27b7d308)
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -1033,63 +1122,6 @@
 
 #### v4.14.4 (2026-07-29)
 
-##### Chores
-
-*  incrementing version number - v4.14.3 (ae183ce4)
-*  update changelog for v4.14.3 (462c4f6e)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  trust_proxy upgrade script writes to wrong config.json when started with --config (breaks Docker logins) (#14527) (29f90de6)
@@ -1101,59 +1133,6 @@
 *  up themes (187cb47d)
 *  up composer (52820920)
 *  up themes (ef11f7ee)
-*  incrementing version number - v4.14.2 (217f6ed8)
-*  update changelog for v4.14.2 (f51197b7)
-*  incrementing version number - v4.14.1 (534b5651)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -1184,61 +1163,6 @@
 
 #### v4.14.2 (2026-07-23)
 
-##### Chores
-
-*  incrementing version number - v4.14.1 (534b5651)
-*  update changelog for v4.14.1 (7ec8c095)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  tx error message on /login (c7cab16a)
@@ -1258,57 +1182,6 @@
 *  up widgets (f9958f70)
 *  up harmony (9fdf590d)
 *  up harmony (8d8edee9)
-*  incrementing version number - v4.14.0 (bbc18e7a)
-*  update changelog for v4.14.0 (89c1b50b)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**  fallback strings for new resources: nodebb.admin-admin (b4e38907)
 
 ##### New Features
@@ -1393,56 +1266,6 @@
 *  up web-push (fa7f6d82)
 *  up emoji (3b85c264)
 *  up sharp (e39005c0)
-*  incrementing version number - v4.13.2 (3b9f0c8b)
-*  update changelog for v4.13.2 (6d59c079)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **activitypub:**  disable public key fetch rate limit by default (9f214175)
 
 ##### New Features
@@ -1644,55 +1467,6 @@
 ##### Chores
 
 *  remove log (9da146ef)
-*  incrementing version number - v4.13.1 (f7a8126b)
-*  update changelog for v4.13.1 (a84db031)
-*  incrementing version number - v4.13.0 (7aade857)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -1716,57 +1490,6 @@
 *  canExportData check (304665de)
 
 #### v4.13.1 (2026-06-12)
-
-##### Chores
-
-*  incrementing version number - v4.13.0 (7aade857)
-*  update changelog for v4.13.0 (55ae053f)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -1794,53 +1517,6 @@
 *  up composer and persona for fa7 (f7628301)
 *  remove postinstall for husky (584992ed)
 *  remove postinstall for husky (97e20310)
-*  incrementing version number - v4.12.0 (9456aae1)
-*  update changelog for v4.12.0 (e89ef2e6)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **deps:**
   *  update dependency lint-staged to v17.0.7 (#14317) (4a521b9b)
   *  update dependency lint-staged to v17.0.6 (#14315) (b4a43b97)
@@ -2040,55 +1716,9 @@
 *  en-US intents fallback (cdb143e6)
 *  stub files for intents client-side logic (52c0a360)
 *  up emoji (8caec1da)
-*  incrementing version number - v4.11.3 (6a330ea7)
-*  update changelog for v4.11.3 (97043976)
 *  update .gitignore to ignore api schema test bootstrap files (41581cd3)
 *  replace terser-webpack-plugin with minimizer-webpack-plugin (c647b35d)
 *  up node version (fb0276cd)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-manage-uploads, nodebb.admin-settings-uploads (4120675a)
   *  fallback strings for new resources: nodebb.admin-settings-activitypub (6fcd1147)
@@ -2283,51 +1913,6 @@
 
 *  up emoji (694b5173)
 *  up node version (b1e4248b)
-*  incrementing version number - v4.11.2 (d78d9e24)
-*  update changelog for v4.11.2 (7ee06595)
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -2349,104 +1934,11 @@
 
 #### v4.11.2 (2026-05-01)
 
-##### Chores
-
-*  incrementing version number - v4.11.1 (78b47c7a)
-*  update changelog for v4.11.1 (25f1378e)
-*  incrementing version number - v4.11.0 (e8141e26)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  test manual dispatcher (3d969f0f)
 
 #### v4.11.1 (2026-04-30)
-
-##### Chores
-
-*  incrementing version number - v4.11.0 (e8141e26)
-*  update changelog for v4.11.0 (db9724ad)
-*  incrementing version number - v4.10.3 (31940371)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -2472,48 +1964,6 @@
 *  up harmony (828e64e9)
 *  add non-dir node_modules to gitignore too (01a2283c)
 *  up nodejs requirement (ca22a33b)
-*  incrementing version number - v4.10.3 (31940371)
-*  update changelog for v4.10.3 (4e5aa52f)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-notifications (4cd61002)
   *  fallback strings for new resources: nodebb.user (a27f68da)
@@ -2724,47 +2174,6 @@
 ##### Chores
 
 *  up persona (71c6132f)
-*  incrementing version number - v4.10.2 (c270bb91)
-*  update changelog for v4.10.2 (64c6417c)
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Documentation Changes
 
@@ -2783,49 +2192,6 @@
 *  fix unread deleted topic test (#14164) (15d65943)
 
 #### v4.10.2 (2026-04-08)
-
-##### Chores
-
-*  incrementing version number - v4.10.1 (0c9bbcea)
-*  update changelog for v4.10.1 (afe8683e)
-*  incrementing version number - v4.10.0 (5b703104)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -2855,48 +2221,6 @@
 *  dont create users parallel (b04976ed)
 
 #### v4.10.1 (2026-03-25)
-
-##### Chores
-
-*  incrementing version number - v4.10.0 (5b703104)
-*  update changelog for v4.10.0 (c480df9e)
-*  incrementing version number - v4.9.2 (e6846052)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -2941,44 +2265,6 @@
 *  up mentions (168b17e8)
 *  up composer (73b023b4)
 *  up harmony (ec4e87ff)
-*  incrementing version number - v4.9.2 (e6846052)
-*  update changelog for v4.9.2 (2c00b137)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-activitypub (aeb53043)
   *  fallback strings for new resources: nodebb.world (e9063a63)
@@ -3160,43 +2446,6 @@
 *  up themes (58336941)
 *  up widgets (95fcb392)
 *  up peace (9b22d144)
-*  incrementing version number - v4.9.1 (72e44c86)
-*  update changelog for v4.9.1 (dcc46707)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -3253,42 +2502,6 @@
 ##### Chores
 
 *  up harmony (643991ab)
-*  incrementing version number - v4.9.0 (3fdd1bef)
-*  update changelog for v4.9.0 (a39fa9fc)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -3373,41 +2586,6 @@
 *  up composer & harmony (931ae67d)
 *  up harmony (e6737941)
 *  up harmony (8d6b6f6a)
-*  incrementing version number - v4.8.1 (713ae0c0)
-*  update changelog for v4.8.1 (f53aab43)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-manage-categories (a797090f)
   *  fallback strings for new resources: nodebb.notifications, nodebb.admin-menu, nodebb.admin-settings-activitypub (bde5e0b4)
@@ -3740,40 +2918,6 @@
 *  up dbsearch (469a8ef9)
 *  up harmony (c1a92c47)
 *  up harmony (317be96f)
-*  incrementing version number - v4.8.0 (3fac737a)
-*  update changelog for v4.8.0 (a9fbcf2a)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  incrementing version number - v4.7.1 (afb88805)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -3849,40 +2993,7 @@
 *  up themes (b323b5d8)
 *  up markdown (eb77c9bf)
 *  up mentions (648d9c78)
-*  incrementing version number - v4.7.2 (cd419d8a)
-*  update changelog for v4.7.2 (2f0526b8)
-*  incrementing version number - v4.7.1 (afb88805)
 *  allow direct testing in test/categories.js (29687722)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Documentation Changes
 
@@ -4037,38 +3148,6 @@
 
 *  up body-parser (59dd1ca6)
 *  up mentions (d505301f)
-*  incrementing version number - v4.7.1 (afb88805)
-*  update changelog for v4.7.1 (8668cfb3)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -4088,37 +3167,6 @@
 *  up widget-essentials (9d666550)
 *  remove log (2142b680)
 *  up harmony (59f649b8)
-*  incrementing version number - v4.7.0 (e82d40f8)
-*  update changelog for v4.7.0 (1c0a43dc)
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  incrementing version number - v4.6.2 (f98747db)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Continuous Integration
 
@@ -4157,41 +3205,11 @@
 
 ##### Chores
 
-*  incrementing version number - v4.6.3 (9fc5b0f3)
-*  update changelog for v4.6.3 (3fd193e3)
-*  incrementing version number - v4.6.2 (f98747db)
 *  up dbsearch (dfe53d29)
 *  up harmony, closes #13753 (4e33c1df)
 *  up express-useragent (b5ea2089)
 *  up ttlcache to 2.x (a0a10c8b)
 *  up themes (52c56bc5)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **deps:**
   *  update dependency @stylistic/eslint-plugin to v5.6.1 (#13778) (894f1988)
   *  update redis docker tag to v8.4.0 (#13782) (e24d8c17)
@@ -4340,38 +3358,6 @@
 
 #### v4.6.3 (2025-11-20)
 
-##### Chores
-
-*  incrementing version number - v4.6.2 (f98747db)
-*  update changelog for v4.6.2 (8da3819c)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  update validator dep. to get fix for CVE-2025-56200 (af477d0c)
@@ -4384,34 +3370,6 @@
 
 *  up emoji (5bc5bb3d)
 *  up peace, closes #13774 (f764b791)
-*  incrementing version number - v4.6.1 (f47aa678)
-*  update changelog for v4.6.1 (655c858b)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -4443,33 +3401,6 @@
 
 *  up persona (b309a672)
 *  up harmony (79327e6c)
-*  incrementing version number - v4.6.0 (ee395bc5)
-*  update changelog for v4.6.0 (c0d9bb07)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -4483,36 +3414,10 @@
 ##### Chores
 
 *  remove unneeded secureRandom require (3fcaa678)
-*  incrementing version number - v4.5.2 (ad2da639)
-*  update changelog for v4.5.2 (9a596d67)
 *  fix grammatical error in language string (cf3964be)
 *  remove formatApiResponse logging (feda629f)
 *  up eslint (a5ea4b40)
-*  incrementing version number - v4.5.1 (69f4b61f)
 *  update default settings (5d653571)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **deps:**
   *  update dependency lint-staged to v16.2.3 (#13681) (d7e93a5d)
   *  update actions/download-artifact action to v5 (#13646) (30ca0000)
@@ -4610,31 +3515,6 @@
 
 *  remove obsolete deprecation (52fec493)
 *  up persona (405d2172)
-*  incrementing version number - v4.5.1 (69f4b61f)
-*  update changelog for v4.5.1 (a9fffd7c)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -4681,30 +3561,6 @@
 ##### Chores
 
 *  up dbsearch (c07e81d2)
-*  incrementing version number - v4.5.0 (f05c5d06)
-*  update changelog for v4.5.0 (86d03b1e)
-*  incrementing version number - v4.4.6 (074043ad)
-*  incrementing version number - v4.4.5 (6f106923)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -4772,36 +3628,13 @@
 *  use fontsource-utils/scss to get rid of deprecation warning (44c0413c)
 *  up eslibt (e68deaac)
 *  up widget essentials (e7b47995)
-*  incrementing version number - v4.4.6 (074043ad)
-*  update changelog for v4.4.6 (3895a059)
-*  incrementing version number - v4.4.5 (6f106923)
 *  up eslint (637373e3)
 *  up dbsearch (dae81b76)
 *  up eslint-plugin (18d6e5e1)
 *  up eslint (c056bf56)
 *  remove logs (0315e369)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
 *  up eslint (536ae9d6)
-*  incrementing version number - v4.4.2 (55c510ae)
 *  eslint config (0d595008)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Continuous Integration
 
@@ -5059,31 +3892,6 @@
 
 #### v4.4.6 (2025-08-06)
 
-##### Chores
-
-*  incrementing version number - v4.4.5 (6f106923)
-*  update changelog for v4.4.5 (de05dad2)
-*  incrementing version number - v4.4.4 (d323af44)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### New Features
 
 *  add new brite skin from bootswatch (567ed875)
@@ -5097,27 +3905,6 @@
 ##### Chores
 
 * **config:**  migrate config renovate.json (#13565) (5a864150)
-*  incrementing version number - v4.4.4 (d323af44)
-*  update changelog for v4.4.4 (7b14e267)
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -5142,29 +3929,6 @@
 *  increase timeout of failing test (fe9b49e3)
 
 #### v4.4.4 (2025-06-18)
-
-##### Chores
-
-*  incrementing version number - v4.4.3 (d354c2eb)
-*  update changelog for v4.4.3 (0c9297f8)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -5192,25 +3956,6 @@
 ##### Chores
 
 *  up composer (5f51dfc4)
-*  incrementing version number - v4.4.2 (55c510ae)
-*  update changelog for v4.4.2 (6d40a211)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -5226,24 +3971,6 @@
 *  up dbsearch (30aa0fe6)
 *  up harmony (99234b3f)
 *  up harmony (a16bc738)
-*  incrementing version number - v4.4.1 (5ae79b4e)
-*  update changelog for v4.4.1 (a686cf20)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -5273,23 +4000,6 @@
 ##### Chores
 
 *  up themes (61a63851)
-*  incrementing version number - v4.4.0 (0a75eee3)
-*  update changelog for v4.4.0 (09cc91d5)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -5336,23 +4046,7 @@
   *  update dependency lint-staged to v15.5.2 (#13383) (96dc5c89)
   *  update dependency @eslint/js to v9.26.0 (#13371) (450ce3b8)
   *  update dependency mocha to v11.2.2 (#13366) (e958010f)
-*  incrementing version number - v4.3.2 (b92b5d80)
-*  update changelog for v4.3.2 (0aa9c187)
-*  incrementing version number - v4.3.1 (308e6b9f)
 *  remove unused require (15b6a2c1)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Documentation Changes
 
@@ -5427,21 +4121,6 @@
 ##### Chores
 
 *  up mentions (fcf9e8b7)
-*  incrementing version number - v4.3.1 (308e6b9f)
-*  update changelog for v4.3.1 (2310a7b8)
-*  incrementing version number - v4.3.0 (bff291db)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -5469,20 +4148,6 @@
 *  up widgets (ee2f91ad)
 *  up themes (18867fb1)
 *  update bundled plugins to use eslint9 (343f13e1)
-*  incrementing version number - v4.3.0 (bff291db)
-*  update changelog for v4.3.0 (76c03019)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  incrementing version number - v4.2.1 (852a270c)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Other Changes
 
@@ -5511,23 +4176,10 @@
 *  cut v4.3.0-alpha.2 (c4690392)
 *  cut v4.3.0-alpha (4379df68)
 *  up pg, pg-cursor (#13351) (b57ce29d)
-*  incrementing version number - v4.2.2 (17fecc24)
-*  update changelog for v4.2.2 (ce196589)
 *  up eslint-nodebb (853244a1)
 *  up themes (4301bf97)
-*  incrementing version number - v4.2.1 (852a270c)
 *  up dbsearch (bc8126c7)
 *  up dbsearch (4b9331d9)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **deps:**
   *  update redis docker tag to v7.4.3 (#13358) (7800016f)
   *  update dependency sass-embedded to v1.87.0 (#13347) (bee79784)
@@ -5727,21 +4379,6 @@
 
 #### v4.2.2 (2025-04-22)
 
-##### Chores
-
-*  incrementing version number - v4.2.1 (852a270c)
-*  update changelog for v4.2.1 (4cee37b9)
-*  incrementing version number - v4.2.0 (87581958)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
-
 ##### Bug Fixes
 
 *  escape displayname in topic events (42a5a127)
@@ -5764,17 +4401,6 @@
 *  up harmony (d161eb6f)
 *  up persona (2237e17a)
 *  up persona (75f1f6fb)
-*  incrementing version number - v4.2.0 (87581958)
-*  update changelog for v4.2.0 (c9e0198d)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -5797,19 +4423,9 @@
   *  update dependency lint-staged to v15.5.0 (#13245) (f4fe3f5f)
   *  update dependency sass-embedded to v1.86.0 (#13251) (3bb861ae)
 *  up widgets (ed57f896)
-*  incrementing version number - v4.1.1 (b2afbb16)
-*  update changelog for v4.1.1 (2c3f8561)
 *  add missing file to az lang (d7116adc)
 *  language labels for az/pl (61d17c95)
 *  alphabetize transifex config file languages (b7bb35f8)
-*  incrementing version number - v4.1.0 (36c80850)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-email (866cd539)
   *  fallback strings for new resources: nodebb.error (b4dfd7fe)
@@ -5895,15 +4511,6 @@
 *  up themes (34414f16)
 *  up mentions (39ff5dde)
 *  up markdown (1d4be475)
-*  incrementing version number - v4.1.0 (36c80850)
-*  update changelog for v4.1.0 (3292a858)
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -5945,20 +4552,12 @@
 
 ##### Chores
 
-*  incrementing version number - v4.0.6 (4a52fb2e)
-*  update changelog for v4.0.6 (78bbea30)
 *  comment out testing helper call (bad0a4c2)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
 *  up harmony (ea110a0e)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
 *  bump emoji for #13077 as well (ff0de097)
 *  fix ap dev helper (b14494b0)
 *  add helper method to ease in dev (d7d64a14)
 *  add helper method to ease in dev (7d5482b2)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **deps:**
   *  update dependency sass-embedded to v1.85.1 (#13208) (3907e6c8)
   *  update postgres docker tag to v17.4 (#13196) (cba2bc5e)
@@ -6086,13 +4685,6 @@
 *  up esbuild (2ab6a368)
 *  up widgets (02a8d9b6)
 *  up harmony (05bbefd1)
-*  incrementing version number - v4.0.5 (1792a62b)
-*  update changelog for v4.0.5 (f84b9fc7)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -6144,12 +4736,6 @@
 *  up dbsearch (d0a9ddea)
 *  up dbsearch (310fab65)
 *  add test helper to activitypub file (4bc0031f)
-*  incrementing version number - v4.0.4 (b1125cce)
-*  update changelog for v4.0.4 (d3b69a39)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -6189,11 +4775,6 @@
 *  up harmony (df07fcfa)
 *  up harmony (de5caf8f)
 *  up harmony (d1f78295)
-*  incrementing version number - v4.0.3 (2b65c735)
-*  update changelog for v4.0.3 (123e1635)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 * **i18n:**  fallback strings for new resources: nodebb.themes-harmony (99210918)
 
 ##### Bug Fixes
@@ -6236,10 +4817,6 @@
 *  up peace (55eedcbe)
 *  up themes (38a21e29)
 *  up harmony (58e551fe)
-*  incrementing version number - v4.0.2 (73fe5fcf)
-*  update changelog for v4.0.2 (75588ffe)
-*  incrementing version number - v4.0.1 (a461b758)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### Bug Fixes
 
@@ -6276,9 +4853,6 @@
 *  up persona (0298a3af)
 *  up harmony (d77d2055)
 *  up themes, closes #13102 (6672de00)
-*  incrementing version number - v4.0.1 (a461b758)
-*  update changelog for v4.0.1 (3dbd2b30)
-*  incrementing version number - v4.0.0 (c1eaee45)
 
 ##### New Features
 
@@ -6310,8 +4884,6 @@
 *  up themes (6918c3f3)
 *  up themes (050effe2)
 *  up harmony (90e0a2d6)
-*  incrementing version number - v4.0.0 (c1eaee45)
-*  update changelog for v4.0.0 (ae8f58d6)
 
 ##### New Features
 
@@ -6361,7 +4933,6 @@
 * **i18n:**
   *  fallback strings for new resources: nodebb.error (e53b3737)
   *  fallback strings for new resources: nodebb.aria (d04bdd9d)
-*  update changelog for v3.12.4 (e7e682ed)
 *  bump persona (3e08eb39)
 *  bump markdown, harmony, and persona to new major versions (499df8ab)
 *  remove now-unneeded v4 upgrade scripts (487e7be5)
@@ -7309,69 +5880,6 @@
 
 *  up harmony (cfb22da1)
 *  up harmony (d0715ca4)
-*  incrementing version number - v3.12.3 (abb2417e)
-*  update changelog for v3.12.3 (0cc94bbe)
-*  incrementing version number - v3.12.2 (a1269b39)
-*  incrementing version number - v3.12.1 (944c4e66)
-*  incrementing version number - v3.12.0 (052c195e)
-*  incrementing version number - v3.11.1 (0c0dd480)
-*  incrementing version number - v3.11.0 (acf27e85)
-*  incrementing version number - v3.10.3 (57d54224)
-*  incrementing version number - v3.10.2 (2f15f464)
-*  incrementing version number - v3.10.1 (cca3a644)
-*  incrementing version number - v3.10.0 (b60a9b4e)
-*  incrementing version number - v3.9.1 (f120c91c)
-*  incrementing version number - v3.9.0 (4880f32d)
-*  incrementing version number - v3.8.4 (4833f9a6)
-*  incrementing version number - v3.8.3 (97ce2c44)
-*  incrementing version number - v3.8.2 (72d91251)
-*  incrementing version number - v3.8.1 (527326f7)
-*  incrementing version number - v3.8.0 (e228a6eb)
-*  incrementing version number - v3.7.5 (6882894d)
-*  incrementing version number - v3.7.4 (6678744c)
-*  incrementing version number - v3.7.3 (2d62b6f6)
-*  incrementing version number - v3.7.2 (cc257e7e)
-*  incrementing version number - v3.7.1 (712365a5)
-*  incrementing version number - v3.7.0 (9a6153d7)
-*  incrementing version number - v3.6.7 (86a17e38)
-*  incrementing version number - v3.6.6 (6604bf37)
-*  incrementing version number - v3.6.5 (6c653625)
-*  incrementing version number - v3.6.4 (83d131b4)
-*  incrementing version number - v3.6.3 (fc7d2bfd)
-*  incrementing version number - v3.6.2 (0f577a57)
-*  incrementing version number - v3.6.1 (f1a69468)
-*  incrementing version number - v3.6.0 (4cdf85f8)
-*  incrementing version number - v3.5.3 (ed0e8783)
-*  incrementing version number - v3.5.2 (52fbb2da)
-*  incrementing version number - v3.5.1 (4c543488)
-*  incrementing version number - v3.5.0 (d06fb4f0)
-*  incrementing version number - v3.4.3 (5c984250)
-*  incrementing version number - v3.4.2 (3f0dac38)
-*  incrementing version number - v3.4.1 (01e69574)
-*  incrementing version number - v3.4.0 (fd9247c5)
-*  incrementing version number - v3.3.9 (5805e770)
-*  incrementing version number - v3.3.8 (a5603565)
-*  incrementing version number - v3.3.7 (b26f1744)
-*  incrementing version number - v3.3.6 (7fb38792)
-*  incrementing version number - v3.3.4 (a67f84ea)
-*  incrementing version number - v3.3.3 (f94d239b)
-*  incrementing version number - v3.3.2 (ec9dac97)
-*  incrementing version number - v3.3.1 (151cc68f)
-*  incrementing version number - v3.3.0 (fc1ad70f)
-*  incrementing version number - v3.2.3 (b06d3e63)
-*  incrementing version number - v3.2.2 (758ecfcd)
-*  incrementing version number - v3.2.1 (20145074)
-*  incrementing version number - v3.2.0 (9ecac38e)
-*  incrementing version number - v3.1.7 (0b4e81ab)
-*  incrementing version number - v3.1.6 (b3a3b130)
-*  incrementing version number - v3.1.5 (ec19343a)
-*  incrementing version number - v3.1.4 (2452783c)
-*  incrementing version number - v3.1.3 (3b4e9d3f)
-*  incrementing version number - v3.1.2 (40fa3489)
-*  incrementing version number - v3.1.1 (40250733)
-*  incrementing version number - v3.1.0 (0cb386bd)
-*  incrementing version number - v3.0.1 (26f6ea49)
-*  incrementing version number - v3.0.0 (224e08cd)
 
 ##### Bug Fixes
 
@@ -7384,68 +5892,6 @@
 
 *  up harmony (5120d117)
 *  up 2factor (c6eaea30)
-*  incrementing version number - v3.12.2 (a1269b39)
-*  update changelog for v3.12.2 (98e5d1b5)
-*  incrementing version number - v3.12.1 (944c4e66)
-*  incrementing version number - v3.12.0 (052c195e)
-*  incrementing version number - v3.11.1 (0c0dd480)
-*  incrementing version number - v3.11.0 (acf27e85)
-*  incrementing version number - v3.10.3 (57d54224)
-*  incrementing version number - v3.10.2 (2f15f464)
-*  incrementing version number - v3.10.1 (cca3a644)
-*  incrementing version number - v3.10.0 (b60a9b4e)
-*  incrementing version number - v3.9.1 (f120c91c)
-*  incrementing version number - v3.9.0 (4880f32d)
-*  incrementing version number - v3.8.4 (4833f9a6)
-*  incrementing version number - v3.8.3 (97ce2c44)
-*  incrementing version number - v3.8.2 (72d91251)
-*  incrementing version number - v3.8.1 (527326f7)
-*  incrementing version number - v3.8.0 (e228a6eb)
-*  incrementing version number - v3.7.5 (6882894d)
-*  incrementing version number - v3.7.4 (6678744c)
-*  incrementing version number - v3.7.3 (2d62b6f6)
-*  incrementing version number - v3.7.2 (cc257e7e)
-*  incrementing version number - v3.7.1 (712365a5)
-*  incrementing version number - v3.7.0 (9a6153d7)
-*  incrementing version number - v3.6.7 (86a17e38)
-*  incrementing version number - v3.6.6 (6604bf37)
-*  incrementing version number - v3.6.5 (6c653625)
-*  incrementing version number - v3.6.4 (83d131b4)
-*  incrementing version number - v3.6.3 (fc7d2bfd)
-*  incrementing version number - v3.6.2 (0f577a57)
-*  incrementing version number - v3.6.1 (f1a69468)
-*  incrementing version number - v3.6.0 (4cdf85f8)
-*  incrementing version number - v3.5.3 (ed0e8783)
-*  incrementing version number - v3.5.2 (52fbb2da)
-*  incrementing version number - v3.5.1 (4c543488)
-*  incrementing version number - v3.5.0 (d06fb4f0)
-*  incrementing version number - v3.4.3 (5c984250)
-*  incrementing version number - v3.4.2 (3f0dac38)
-*  incrementing version number - v3.4.1 (01e69574)
-*  incrementing version number - v3.4.0 (fd9247c5)
-*  incrementing version number - v3.3.9 (5805e770)
-*  incrementing version number - v3.3.8 (a5603565)
-*  incrementing version number - v3.3.7 (b26f1744)
-*  incrementing version number - v3.3.6 (7fb38792)
-*  incrementing version number - v3.3.4 (a67f84ea)
-*  incrementing version number - v3.3.3 (f94d239b)
-*  incrementing version number - v3.3.2 (ec9dac97)
-*  incrementing version number - v3.3.1 (151cc68f)
-*  incrementing version number - v3.3.0 (fc1ad70f)
-*  incrementing version number - v3.2.3 (b06d3e63)
-*  incrementing version number - v3.2.2 (758ecfcd)
-*  incrementing version number - v3.2.1 (20145074)
-*  incrementing version number - v3.2.0 (9ecac38e)
-*  incrementing version number - v3.1.7 (0b4e81ab)
-*  incrementing version number - v3.1.6 (b3a3b130)
-*  incrementing version number - v3.1.5 (ec19343a)
-*  incrementing version number - v3.1.4 (2452783c)
-*  incrementing version number - v3.1.3 (3b4e9d3f)
-*  incrementing version number - v3.1.2 (40fa3489)
-*  incrementing version number - v3.1.1 (40250733)
-*  incrementing version number - v3.1.0 (0cb386bd)
-*  incrementing version number - v3.0.1 (26f6ea49)
-*  incrementing version number - v3.0.0 (224e08cd)
 
 ##### Bug Fixes
 
@@ -7466,67 +5912,6 @@
 *  up deps (48944a86)
 *  up composer-default (80ddc03a)
 *  up harmony (5b2dfd74)
-*  incrementing version number - v3.12.1 (944c4e66)
-*  update changelog for v3.12.1 (22606767)
-*  incrementing version number - v3.12.0 (052c195e)
-*  incrementing version number - v3.11.1 (0c0dd480)
-*  incrementing version number - v3.11.0 (acf27e85)
-*  incrementing version number - v3.10.3 (57d54224)
-*  incrementing version number - v3.10.2 (2f15f464)
-*  incrementing version number - v3.10.1 (cca3a644)
-*  incrementing version number - v3.10.0 (b60a9b4e)
-*  incrementing version number - v3.9.1 (f120c91c)
-*  incrementing version number - v3.9.0 (4880f32d)
-*  incrementing version number - v3.8.4 (4833f9a6)
-*  incrementing version number - v3.8.3 (97ce2c44)
-*  incrementing version number - v3.8.2 (72d91251)
-*  incrementing version number - v3.8.1 (527326f7)
-*  incrementing version number - v3.8.0 (e228a6eb)
-*  incrementing version number - v3.7.5 (6882894d)
-*  incrementing version number - v3.7.4 (6678744c)
-*  incrementing version number - v3.7.3 (2d62b6f6)
-*  incrementing version number - v3.7.2 (cc257e7e)
-*  incrementing version number - v3.7.1 (712365a5)
-*  incrementing version number - v3.7.0 (9a6153d7)
-*  incrementing version number - v3.6.7 (86a17e38)
-*  incrementing version number - v3.6.6 (6604bf37)
-*  incrementing version number - v3.6.5 (6c653625)
-*  incrementing version number - v3.6.4 (83d131b4)
-*  incrementing version number - v3.6.3 (fc7d2bfd)
-*  incrementing version number - v3.6.2 (0f577a57)
-*  incrementing version number - v3.6.1 (f1a69468)
-*  incrementing version number - v3.6.0 (4cdf85f8)
-*  incrementing version number - v3.5.3 (ed0e8783)
-*  incrementing version number - v3.5.2 (52fbb2da)
-*  incrementing version number - v3.5.1 (4c543488)
-*  incrementing version number - v3.5.0 (d06fb4f0)
-*  incrementing version number - v3.4.3 (5c984250)
-*  incrementing version number - v3.4.2 (3f0dac38)
-*  incrementing version number - v3.4.1 (01e69574)
-*  incrementing version number - v3.4.0 (fd9247c5)
-*  incrementing version number - v3.3.9 (5805e770)
-*  incrementing version number - v3.3.8 (a5603565)
-*  incrementing version number - v3.3.7 (b26f1744)
-*  incrementing version number - v3.3.6 (7fb38792)
-*  incrementing version number - v3.3.4 (a67f84ea)
-*  incrementing version number - v3.3.3 (f94d239b)
-*  incrementing version number - v3.3.2 (ec9dac97)
-*  incrementing version number - v3.3.1 (151cc68f)
-*  incrementing version number - v3.3.0 (fc1ad70f)
-*  incrementing version number - v3.2.3 (b06d3e63)
-*  incrementing version number - v3.2.2 (758ecfcd)
-*  incrementing version number - v3.2.1 (20145074)
-*  incrementing version number - v3.2.0 (9ecac38e)
-*  incrementing version number - v3.1.7 (0b4e81ab)
-*  incrementing version number - v3.1.6 (b3a3b130)
-*  incrementing version number - v3.1.5 (ec19343a)
-*  incrementing version number - v3.1.4 (2452783c)
-*  incrementing version number - v3.1.3 (3b4e9d3f)
-*  incrementing version number - v3.1.2 (40fa3489)
-*  incrementing version number - v3.1.1 (40250733)
-*  incrementing version number - v3.1.0 (0cb386bd)
-*  incrementing version number - v3.0.1 (26f6ea49)
-*  incrementing version number - v3.0.0 (224e08cd)
 
 ##### New Features
 
@@ -7593,66 +5978,6 @@
 
 *  up harmony (18904bbb)
 *  up persona (b4ec3a6a)
-*  incrementing version number - v3.12.0 (052c195e)
-*  update changelog for v3.12.0 (5395062d)
-*  incrementing version number - v3.11.1 (0c0dd480)
-*  incrementing version number - v3.11.0 (acf27e85)
-*  incrementing version number - v3.10.3 (57d54224)
-*  incrementing version number - v3.10.2 (2f15f464)
-*  incrementing version number - v3.10.1 (cca3a644)
-*  incrementing version number - v3.10.0 (b60a9b4e)
-*  incrementing version number - v3.9.1 (f120c91c)
-*  incrementing version number - v3.9.0 (4880f32d)
-*  incrementing version number - v3.8.4 (4833f9a6)
-*  incrementing version number - v3.8.3 (97ce2c44)
-*  incrementing version number - v3.8.2 (72d91251)
-*  incrementing version number - v3.8.1 (527326f7)
-*  incrementing version number - v3.8.0 (e228a6eb)
-*  incrementing version number - v3.7.5 (6882894d)
-*  incrementing version number - v3.7.4 (6678744c)
-*  incrementing version number - v3.7.3 (2d62b6f6)
-*  incrementing version number - v3.7.2 (cc257e7e)
-*  incrementing version number - v3.7.1 (712365a5)
-*  incrementing version number - v3.7.0 (9a6153d7)
-*  incrementing version number - v3.6.7 (86a17e38)
-*  incrementing version number - v3.6.6 (6604bf37)
-*  incrementing version number - v3.6.5 (6c653625)
-*  incrementing version number - v3.6.4 (83d131b4)
-*  incrementing version number - v3.6.3 (fc7d2bfd)
-*  incrementing version number - v3.6.2 (0f577a57)
-*  incrementing version number - v3.6.1 (f1a69468)
-*  incrementing version number - v3.6.0 (4cdf85f8)
-*  incrementing version number - v3.5.3 (ed0e8783)
-*  incrementing version number - v3.5.2 (52fbb2da)
-*  incrementing version number - v3.5.1 (4c543488)
-*  incrementing version number - v3.5.0 (d06fb4f0)
-*  incrementing version number - v3.4.3 (5c984250)
-*  incrementing version number - v3.4.2 (3f0dac38)
-*  incrementing version number - v3.4.1 (01e69574)
-*  incrementing version number - v3.4.0 (fd9247c5)
-*  incrementing version number - v3.3.9 (5805e770)
-*  incrementing version number - v3.3.8 (a5603565)
-*  incrementing version number - v3.3.7 (b26f1744)
-*  incrementing version number - v3.3.6 (7fb38792)
-*  incrementing version number - v3.3.4 (a67f84ea)
-*  incrementing version number - v3.3.3 (f94d239b)
-*  incrementing version number - v3.3.2 (ec9dac97)
-*  incrementing version number - v3.3.1 (151cc68f)
-*  incrementing version number - v3.3.0 (fc1ad70f)
-*  incrementing version number - v3.2.3 (b06d3e63)
-*  incrementing version number - v3.2.2 (758ecfcd)
-*  incrementing version number - v3.2.1 (20145074)
-*  incrementing version number - v3.2.0 (9ecac38e)
-*  incrementing version number - v3.1.7 (0b4e81ab)
-*  incrementing version number - v3.1.6 (b3a3b130)
-*  incrementing version number - v3.1.5 (ec19343a)
-*  incrementing version number - v3.1.4 (2452783c)
-*  incrementing version number - v3.1.3 (3b4e9d3f)
-*  incrementing version number - v3.1.2 (40fa3489)
-*  incrementing version number - v3.1.1 (40250733)
-*  incrementing version number - v3.1.0 (0cb386bd)
-*  incrementing version number - v3.0.1 (26f6ea49)
-*  incrementing version number - v3.0.0 (224e08cd)
 
 ##### Bug Fixes
 
@@ -7676,70 +6001,11 @@
 *  remove lines re: incrementing version number, in changelog (cc6963f2)
 *  up themes (e0c345b2)
 *  up persona (2a085cdb)
-*  incrementing version number - v3.11.1 (0c0dd480)
-*  update changelog for v3.11.1 (fee57816)
 *  up themes (e532dcb4)
 *  up spam-be-gone (3a7e9733)
 *  up peace (a72c067f)
 *  up themes (a4a752bb)
 *  up mentions (4db5a5b6)
-*  incrementing version number - v3.11.0 (acf27e85)
-*  incrementing version number - v3.10.3 (57d54224)
-*  incrementing version number - v3.10.2 (2f15f464)
-*  incrementing version number - v3.10.1 (cca3a644)
-*  incrementing version number - v3.10.0 (b60a9b4e)
-*  incrementing version number - v3.9.1 (f120c91c)
-*  incrementing version number - v3.9.0 (4880f32d)
-*  incrementing version number - v3.8.4 (4833f9a6)
-*  incrementing version number - v3.8.3 (97ce2c44)
-*  incrementing version number - v3.8.2 (72d91251)
-*  incrementing version number - v3.8.1 (527326f7)
-*  incrementing version number - v3.8.0 (e228a6eb)
-*  incrementing version number - v3.7.5 (6882894d)
-*  incrementing version number - v3.7.4 (6678744c)
-*  incrementing version number - v3.7.3 (2d62b6f6)
-*  incrementing version number - v3.7.2 (cc257e7e)
-*  incrementing version number - v3.7.1 (712365a5)
-*  incrementing version number - v3.7.0 (9a6153d7)
-*  incrementing version number - v3.6.7 (86a17e38)
-*  incrementing version number - v3.6.6 (6604bf37)
-*  incrementing version number - v3.6.5 (6c653625)
-*  incrementing version number - v3.6.4 (83d131b4)
-*  incrementing version number - v3.6.3 (fc7d2bfd)
-*  incrementing version number - v3.6.2 (0f577a57)
-*  incrementing version number - v3.6.1 (f1a69468)
-*  incrementing version number - v3.6.0 (4cdf85f8)
-*  incrementing version number - v3.5.3 (ed0e8783)
-*  incrementing version number - v3.5.2 (52fbb2da)
-*  incrementing version number - v3.5.1 (4c543488)
-*  incrementing version number - v3.5.0 (d06fb4f0)
-*  incrementing version number - v3.4.3 (5c984250)
-*  incrementing version number - v3.4.2 (3f0dac38)
-*  incrementing version number - v3.4.1 (01e69574)
-*  incrementing version number - v3.4.0 (fd9247c5)
-*  incrementing version number - v3.3.9 (5805e770)
-*  incrementing version number - v3.3.8 (a5603565)
-*  incrementing version number - v3.3.7 (b26f1744)
-*  incrementing version number - v3.3.6 (7fb38792)
-*  incrementing version number - v3.3.4 (a67f84ea)
-*  incrementing version number - v3.3.3 (f94d239b)
-*  incrementing version number - v3.3.2 (ec9dac97)
-*  incrementing version number - v3.3.1 (151cc68f)
-*  incrementing version number - v3.3.0 (fc1ad70f)
-*  incrementing version number - v3.2.3 (b06d3e63)
-*  incrementing version number - v3.2.2 (758ecfcd)
-*  incrementing version number - v3.2.1 (20145074)
-*  incrementing version number - v3.2.0 (9ecac38e)
-*  incrementing version number - v3.1.7 (0b4e81ab)
-*  incrementing version number - v3.1.6 (b3a3b130)
-*  incrementing version number - v3.1.5 (ec19343a)
-*  incrementing version number - v3.1.4 (2452783c)
-*  incrementing version number - v3.1.3 (3b4e9d3f)
-*  incrementing version number - v3.1.2 (40fa3489)
-*  incrementing version number - v3.1.1 (40250733)
-*  incrementing version number - v3.1.0 (0cb386bd)
-*  incrementing version number - v3.0.1 (26f6ea49)
-*  incrementing version number - v3.0.0 (224e08cd)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-extend-plugins (6b5b9a4e)
   *  fallback strings for new resources: nodebb.admin-extend-plugins (26a1a2f1)
@@ -7815,7 +6081,6 @@
 
 * **config:**  migrate config renovate.json (#12960) (14f698f9)
 *  up spam-be-gone (e5c8deb8)
-*  update changelog for v3.11.0 (0333d263)
 
 ##### Bug Fixes
 
@@ -7866,7 +6131,6 @@
 *  up themes (65f64eba)
 *  up themes (280e7613)
 *  up widgets (b13bd803)
-*  update changelog for v3.10.3 (83965385)
 *  up harmony (f6f1d906)
 *  up harmony (9426fd1a)
 * **deps:**
@@ -7991,10 +6255,6 @@
 
 #### v3.10.3 (2024-10-23)
 
-##### Chores
-
-*  update changelog for v3.10.2 (e780120a)
-
 ##### Bug Fixes
 
 *  add missing await (0082ac98)
@@ -8002,10 +6262,6 @@
 *  don't crash if profile folder doesn't exist (8a89c5d7)
 
 #### v3.10.2 (2024-10-18)
-
-##### Chores
-
-*  update changelog for v3.10.1 (d63a8cca)
 
 ##### Bug Fixes
 
@@ -8026,7 +6282,6 @@
 ##### Chores
 
 *  up composer (a5f3d097)
-*  update changelog for v3.10.0 (a9da495d)
 
 ##### Bug Fixes
 
@@ -8070,7 +6325,6 @@
 
 *  up themes (8bca9768)
 *  up widgets (41c73de5)
-*  update changelog for v3.9.0 (c3d97c6c)
 
 ##### Bug Fixes
 
@@ -8136,7 +6390,6 @@
 *  up widgets (bf6be3ef)
 *  up widgets (32d4ac84)
 *  up harmony (780db9e2)
-*  update changelog for v3.8.4 (693bac5b)
 * **i18n:**
   *  fallback strings for new resources: nodebb.users (d348d1df)
   *  fallback strings for new resources: nodebb.admin-extend-widgets (16ee1ad7)
@@ -8300,7 +6553,6 @@
 *  up widgets (d1663ac2)
 *  up widgets (cb4bf9dd)
 *  up persona (324610de)
-*  update changelog for v3.8.3 (2a239a79)
 
 ##### New Features
 
@@ -8332,7 +6584,6 @@
 *  up dbsearch (8a42db6f)
 *  use nodebb fork of spider-detector (3a1b39c9)
 *  up 2factor (142de2ca)
-*  update changelog for v3.8.2 (3854a434)
 
 ##### New Features
 
@@ -8418,7 +6669,6 @@
 
 *  up composer (83facb7d)
 *  up harmony (17ea61a0)
-*  update changelog for v3.8.1 (5ef3e0f3)
 
 ##### New Features
 
@@ -8436,10 +6686,6 @@
 *  render (2c0f8c91)
 
 #### v3.8.1 (2024-05-15)
-
-##### Chores
-
-*  update changelog for v3.8.0 (2ef2750d)
 
 ##### Bug Fixes
 
@@ -8474,7 +6720,6 @@
   *  update dependency sass-embedded to v1.72.0 (#12406) (6d62e592)
   *  update commitlint monorepo to v19.1.0 (#12403) (3d095a6b)
 *  up themes (1e3a321d)
-*  update changelog for v3.7.5 (febeede5)
 *  up harmony (80a1a0e0)
 *  up harmony (1a000eae)
 * **i18n:**
@@ -8600,10 +6845,6 @@
 
 #### v3.7.5 (2024-05-03)
 
-##### Chores
-
-*  update changelog for v3.7.4 (8a1b281b)
-
 ##### Bug Fixes
 
 *  #12543, use PATCH (420c8999)
@@ -8616,7 +6857,6 @@
 *  up harmony (c2465a16)
 *  up themes (ba86740a)
 *  up themes (5d8a5571)
-*  update changelog for v3.7.3 (8d450eea)
 
 ##### New Features
 
@@ -8652,7 +6892,6 @@
 ##### Chores
 
 *  up ntfy (0058ca68)
-*  update changelog for v3.7.2 (277e1787)
 
 ##### Bug Fixes
 
@@ -8665,7 +6904,6 @@
 
 *  up harmony (0171e73a)
 *  up harmony (c6915398)
-*  update changelog for v3.7.1 (07640389)
 
 ##### New Features
 
@@ -8692,7 +6930,6 @@
 *  up harmony (1b24b337)
 *  up harmony (b6c3a9d2)
 *  up harmony (f107a7ff)
-*  update changelog for v3.7.0 (f1f81b17)
 
 ##### New Features
 
@@ -8729,7 +6966,6 @@
 *  up harmony (25ef62dc)
 *  up peace (3aaa0727)
 *  up peace (65f3c734)
-*  update changelog for v3.6.7 (caf8722f)
 *  up harmony (22cd80b9)
 *  up themes (96fc20a3)
 *  up themes (421c7fc5)
@@ -8894,10 +7130,6 @@
 
 #### v3.6.7 (2024-02-28)
 
-##### Chores
-
-*  update changelog for v3.6.6 (debaa2b9)
-
 ##### Bug Fixes
 
 *  #12372, fix manual digest buttons (107f5613)
@@ -8912,10 +7144,6 @@
 
 #### v3.6.6 (2024-02-14)
 
-##### Chores
-
-*  update changelog for v3.6.5 (04039f76)
-
 ##### Bug Fixes
 
 *  closes #12329, fix default value of categoryWatchState (88e9fa37)
@@ -8926,19 +7154,11 @@
 
 #### v3.6.5 (2024-01-31)
 
-##### Chores
-
-*  update changelog for v3.6.4 (6e6c3974)
-
 ##### Bug Fixes
 
 *  #12320, .text() gets \n\t characters (67c8bd99)
 
 #### v3.6.4 (2024-01-24)
-
-##### Chores
-
-*  update changelog for v3.6.3 (92ffc57c)
 
 ##### New Features
 
@@ -8957,10 +7177,6 @@
 
 #### v3.6.3 (2024-01-12)
 
-##### Chores
-
-*  update changelog for v3.6.2 (82a936c3)
-
 ##### Bug Fixes
 
 *  #12275, pin sharp to 0.32.6 (f3927ce7)
@@ -8975,7 +7191,6 @@
 *  up harmony (b6dbe1a6)
 *  up lavender (16f0affa)
 *  up themes (980bfee8)
-*  update changelog for v3.6.1 (1e4abdbf)
 
 ##### New Features
 
@@ -8992,10 +7207,6 @@
 *  dont load all followed tids on unread/recent?filter=watched (563e03b6)
 
 #### v3.6.1 (2023-12-22)
-
-##### Chores
-
-*  update changelog for v3.6.0 (eb92cee6)
 
 ##### Bug Fixes
 
@@ -9020,7 +7231,6 @@
 *  make error:email-taken slightly more descriptive (dd0743d3)
 *  up harmony (250cc771)
 *  up harmony (9324a75c)
-*  update changelog for v3.5.3 (e49ddaf8)
 *  up harmony (dbbf3a2c)
 *  up harmony (e4656bd4)
 *  up themes (0ec9d4c3)
@@ -9203,7 +7413,6 @@
 
 *  up composer (245e5df3)
 *  up composer default (c1f82b78)
-*  update changelog for v3.5.2 (e2e85053)
 
 ##### Bug Fixes
 
@@ -9218,7 +7427,6 @@
 ##### Chores
 
 *  up composer (49013f81)
-*  update changelog for v3.5.1 (48f7ae99)
 
 ##### Bug Fixes
 
@@ -9230,7 +7438,6 @@
 ##### Chores
 
 *  up mentions (b1b3dcb6)
-*  update changelog for v3.5.0 (5d7c10f1)
 
 ##### New Features
 
@@ -9275,7 +7482,6 @@
 *  up persona (cc5e9d9c)
 *  up harmony (769f879e)
 *  up themes (46530337)
-*  update changelog for v3.4.3 (08949be9)
 *  up themes (e0b29ba9)
 *  up emoji (00dd0cb3)
 *  up emoji (86de8cb2)
@@ -9500,10 +7706,6 @@
 
 #### v3.4.3 (2023-09-27)
 
-##### Chores
-
-*  update changelog for v3.4.2 (f9323de6)
-
 ##### Bug Fixes
 
 *  change priv to topics:read (cddac03a)
@@ -9529,7 +7731,6 @@
 *  up harmony (512c44d5)
 *  up harmony (319d3b1f)
 *  up themes (d7a7c355)
-*  update changelog for v3.4.1 (f24a334c)
 
 ##### Bug Fixes
 
@@ -9553,7 +7754,6 @@
 ##### Chores
 
 *  up dbsearch (8357bb2e)
-*  update changelog for v3.4.0 (5c023025)
 
 ##### Bug Fixes
 
@@ -9572,7 +7772,6 @@
 *  up themes (10d11924)
 *  up harmony (0334b389)
 *  up harmony (32c870f4)
-*  update changelog for v3.3.9 (50d44777)
 *  up composer (ffd6ea5a)
 *  up composer (c2534287)
 *  up composer (540b9f18)
@@ -9683,7 +7882,6 @@
 ##### Chores
 
 *  up mentions (4ec3a480)
-*  update changelog for v3.3.8 (65e16e9f)
 
 ##### Bug Fixes
 
@@ -9695,20 +7893,12 @@
 
 #### v3.3.8 (2023-08-23)
 
-##### Chores
-
-*  update changelog for v3.3.7 (1193fa04)
-
 ##### Bug Fixes
 
 *  msg ref (4ba76338)
 *  #11947, make user message has a numeric timestamp (2d62a772)
 
 #### v3.3.7 (2023-08-23)
-
-##### Chores
-
-*  update changelog for v3.3.6 (a43354c0)
 
 ##### Bug Fixes
 
@@ -9722,19 +7912,11 @@
 
 #### v3.3.4 (2023-08-20)
 
-##### Chores
-
-*  update changelog for v3.3.3 (38149a57)
-
 ##### Bug Fixes
 
 *  upgrade script, get rid of nested processSortedSet (78a7cfe9)
 
 #### v3.3.3 (2023-08-19)
-
-##### Chores
-
-*  update changelog for v3.3.2 (2ecf15c4)
 
 ##### Bug Fixes
 
@@ -9748,10 +7930,6 @@
 
 #### v3.3.2 (2023-08-18)
 
-##### Chores
-
-*  update changelog for v3.3.1 (6f961f9c)
-
 ##### Bug Fixes
 
 *  upgrade script (c02f1d70)
@@ -9761,7 +7939,6 @@
 ##### Chores
 
 *  up themes (62231baa)
-*  update changelog for v3.3.0 (46f7405d)
 
 ##### New Features
 
@@ -9825,7 +8002,6 @@
 *  up harmony (ee0128d7)
 *  up harmony (ba03e223)
 *  up themes (6fc80f9f)
-*  update changelog for v3.2.3 (afb38c71)
 *  up mentions (4b92df75)
 *  up composer (48a04eb7)
 *  up harmony (efc250f2)
@@ -10018,7 +8194,6 @@
 ##### Chores
 
 *  downgrade harmony to correct version (7c94506b)
-*  update changelog for v3.2.2 (91a432ad)
 
 ##### Bug Fixes
 
@@ -10036,7 +8211,6 @@
 *  up themes (f1170b18)
 *  up spam-be-gone (eed34d04)
 *  remove log (509faa5e)
-*  update changelog for v3.2.1 (c7f8cee9)
 
 ##### Bug Fixes
 
@@ -10050,7 +8224,6 @@
 *  up harmony (9fc5ae08)
 *  up composer (82d37702)
 *  up spider-detector (97d8f858)
-*  update changelog for v3.2.0 (080f9e75)
 
 ##### Bug Fixes
 
@@ -10088,7 +8261,6 @@
 *  up harmony (777c7d09)
 *  up deps (7f465006)
 *  up harmony (f9e37829)
-*  update changelog for v3.1.7 (8744e412)
 *  up persona (7a0e5c6d)
 *  up harmony (be474fb4)
 *  up harmony (1896b486)
@@ -10354,10 +8526,6 @@
 
 #### v3.1.7 (2023-06-21)
 
-##### Chores
-
-*  update changelog for v3.1.6 (f10a2d2e)
-
 ##### Bug Fixes
 
 *  #11735, crash when making guest reply (f2fe7c06)
@@ -10365,10 +8533,6 @@
 *  #11723, fix pagination on following/follower page (4e146eb5)
 
 #### v3.1.6 (2023-06-15)
-
-##### Chores
-
-*  update changelog for v3.1.5 (b0d16861)
 
 ##### Bug Fixes
 
@@ -10381,7 +8545,6 @@
 
 *  fix persona (74174414)
 *  up themes (97ff1f11)
-*  update changelog for v3.1.4 (633dc2de)
 
 ##### New Features
 
@@ -10409,7 +8572,6 @@
 ##### Chores
 
 *  up markdown (51bf5e95)
-*  update changelog for v3.1.3 (9924fde6)
 
 ##### Bug Fixes
 
@@ -10429,10 +8591,6 @@
 
 #### v3.1.3 (2023-05-15)
 
-##### Chores
-
-*  update changelog for v3.1.2 (5b398782)
-
 ##### Continuous Integration
 
 *  use GitHub Actions expression instead of handlebars template (#11599) (412a1ecf)
@@ -10450,19 +8608,11 @@
 
 #### v3.1.2 (2023-05-12)
 
-##### Chores
-
-*  update changelog for v3.1.1 (ccd6f48c)
-
 ##### Bug Fixes
 
 *  #11595, use default value (28740de7)
 
 #### v3.1.1 (2023-05-11)
-
-##### Chores
-
-*  update changelog for v3.1.0 (2c515dc3)
 
 ##### Documentation Changes
 
@@ -10492,7 +8642,6 @@
 *  up harmony (eab2679f)
 *  up harmony (7f19913b)
 *  up themes (832fe95a)
-*  update changelog for v3.0.1 (fd30af10)
 *  whopps (ec0da196)
 *  up harmony (2caf4afc)
 *  up harmony (9e4bd4e9)
@@ -10641,10 +8790,6 @@
 *  fix group tests (b891c5ac)
 
 #### v3.0.1 (2023-05-02)
-
-##### Chores
-
-*  update changelog for v3.0.0 (56ad381f)
 
 ##### Bug Fixes
 
@@ -11037,7 +9182,6 @@
 ##### Chores
 
 *  removing superfluous changelog items (5343d2a0)
-*  update changelog for v2.8.11 (f2ca93f6)
 
 ##### New Features
 
@@ -11054,10 +9198,6 @@
 *  remove old comment (21fb8590)
 
 #### v2.8.11 (2023-04-11)
-
-##### Chores
-
-*  update changelog for v2.8.10 (188ec62f)
 
 ##### Continuous Integration
 
@@ -11081,7 +9221,6 @@
 ##### Chores
 
 *  up composer-default (e9a8e195)
-*  update changelog for v2.8.9 (18b2150e)
 
 ##### Bug Fixes
 
@@ -11099,7 +9238,6 @@
 ##### Chores
 
 *  up cron (73a50d17)
-*  update changelog for v2.8.8 (c03d5db7)
 
 ##### Bug Fixes
 
@@ -11118,10 +9256,6 @@
 
 #### v2.8.8 (2023-03-09)
 
-##### Chores
-
-*  update changelog for v2.8.7 (2ca38e7b)
-
 ##### Bug Fixes
 
 *  stop topic navigation hotkeys from firing if in a mousetrap-enabled form element (22fc8fe3)
@@ -11131,10 +9265,6 @@
 *  closes #11331, allow 0 length content if set to 0 in acp (8c762d32)
 
 #### v2.8.7 (2023-03-01)
-
-##### Chores
-
-*  update changelog for v2.8.6 (f3306d03)
 
 ##### Documentation Changes
 
@@ -11161,7 +9291,6 @@
 ##### Chores
 
 * **i18n:**  fallback strings for new resources: nodebb.error (8335f90a)
-*  update changelog for v2.8.5 (24e58c28)
 
 ##### New Features
 
@@ -11183,26 +9312,15 @@
 
 #### v2.8.5 (2023-01-27)
 
-##### Chores
-
-*  update changelog for v2.8.4 (c13f0e21)
-
 ##### Bug Fixes
 
 *  import resolution within plugin modules (#11219) (f6c96948)
-
-#### v2.8.4 (2023-01-26)
-
-##### Chores
-
-*  update changelog for v2.8.3 (eb2841ee)
 
 #### v2.8.3 (2023-01-25)
 
 ##### Chores
 
 *  remove extraneous lines from changelog (48c9f447)
-*  update changelog for v2.8.2 (66aa3169)
 
 ##### Bug Fixes
 
@@ -11227,10 +9345,6 @@
 
 #### v2.8.2 (2023-01-13)
 
-##### Chores
-
-*  update changelog for v2.8.1 (d17d4ec0)
-
 ##### Bug Fixes
 
 *  move call to `filter:middleware.buildHeader` out of parallel so that req can be overridden by plugins prior to loading config (25ae58e8)
@@ -11241,7 +9355,6 @@
 
 *  fallbacks for new language string (8a69e740)
 *  remove extraneous lines from changelog (bbaf26ce)
-*  update changelog for v2.8.0 (a5c2edb9)
 
 ##### Bug Fixes
 
@@ -11258,7 +9371,6 @@
   *  update dependency mocha to v10.2.0 (#11094) (c4cc1e61)
 *  up jquery (3e8f5378)
 *  remove extraneous lines from changelog (e213dbc3)
-*  update changelog for v2.7.0 (4701c96d)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-email (717b3612)
   *  fallback strings for new resources: nodebb.admin-settings-email (4f4b4800)
@@ -11336,10 +9448,6 @@
 
 #### v2.6.1 (2022-11-28)
 
-##### Chores
-
-*  update changelog for v2.6.0 (eedd84ae)
-
 ##### Documentation Changes
 
 *  remote extraneous lines from changelog (8a15e58d)
@@ -11379,7 +9487,6 @@
   *  update postgres docker tag to v14 (#10829) (5aa55d29)
   *  update dependency eslint to v8.23.1 (#10885) (0c6fb6e3)
 *  remove derpy extra changelog bits (445f09f0)
-*  update changelog for v2.5.8 (c9cd8975)
 
 ##### New Features
 
@@ -11503,7 +9610,6 @@
 *  really fix indents this time (c2024f34)
 *  fix indents (d50512e7)
 *  add bootstrap5 to test runner for now (be5d6d29)
-*  update changelog for v2.5.7 (17e948ab)
 
 ##### New Features
 
@@ -11535,19 +9641,11 @@
 
 #### v2.5.7 (2022-10-14)
 
-##### Chores
-
-*  update changelog for v2.5.6 (e92238d0)
-
 ##### Performance Improvements
 
 *  speed up build (dd4e9cce)
 
 #### v2.5.6 (2022-10-13)
-
-##### Chores
-
-*  update changelog for v2.5.5 (e7d0040d)
 
 ##### Bug Fixes
 
@@ -11559,14 +9657,12 @@
 ##### Chores
 
 *  up plugins (b91ef6dd)
-*  update changelog for v2.5.4 (aabf073c)
 
 #### v2.5.4 (2022-10-11)
 
 ##### Chores
 
 *  🤔 (7240e8ce)
-*  update changelog for v2.5.3 (fdf240f6)
 
 ##### Continuous Integration
 
@@ -11587,7 +9683,6 @@
 
 *  remove duplicate version increment lines in changelog (5dbcfef9)
 *  bring back treding plugins (8aa1596d)
-*  update changelog for v2.5.2 (84b6a7c7)
 
 ##### New Features
 
@@ -11614,10 +9709,6 @@
 
 #### v2.5.2 (2022-09-04)
 
-##### Chores
-
-*  update changelog for v2.5.1 (2b2fd4f3)
-
 ##### Bug Fixes
 
 *  registration regression, closes #10875 (f6f37dc1)
@@ -11631,10 +9722,6 @@
 *  disable nbbpm test temporarily (1dc79d76)
 
 #### v2.5.1 (2022-09-02)
-
-##### Chores
-
-*  update changelog for v2.5.0 (1076285d)
 
 ##### Bug Fixes
 
@@ -11655,7 +9742,6 @@
   *  fallback strings for new resources: nodebb.admin-advanced-cache (90fc50e1)
 *  move @textcomplete and its modules to composer-default (3cbb7a3d)
 *  remove client-side js file for tpl that no longer exists (bc2ea860)
-*  update changelog for v2.4.5 (d505cc47)
 
 * **deps:**
   *  update dependency eslint to v8.22.0 (#10835) (8fce68d3)
@@ -11715,10 +9801,6 @@
 
 #### v2.4.5 (2022-08-22)
 
-##### Chores
-
-*  update changelog for v2.4.4 (77e492b8)
-
 ##### Bug Fixes
 
 *  wrap passport.authenticate to pass in keepSessionInfo if not already set (9b96c33d)
@@ -11726,29 +9808,17 @@
 
 #### v2.4.4 (2022-08-18)
 
-##### Chores
-
-*  update changelog for v2.4.3 (06da15a5)
-
 ##### Bug Fixes
 
 *  missing req, closes #10847 (489fb3a3)
 
 #### v2.4.3 (2022-08-18)
 
-##### Chores
-
-*  update changelog for v2.4.2 (ba7a3466)
-
 ##### Bug Fixes
 
 *  #10845, disallow inline viewing of uploaded html files (4dc7fa05)
 
 #### v2.4.2 (2022-08-17)
-
-##### Chores
-
-*  update changelog for v2.4.1 (4b6baabb)
 
 ##### Documentation Changes
 
@@ -11771,7 +9841,6 @@
   *  update docker/build-push-action action to v3 (bfd6318c)
   *  update docker/login-action action to v2 (3d68accf)
   *  update docker/setup-buildx-action action to v2 (371ac032)
-*  update changelog for v2.4.0 (c4714ff7)
 
 ##### Bug Fixes
 
@@ -11787,7 +9856,6 @@
 *  update to new transifex project url (659cfe85)
 *  re-order interstitial tests so email and gdpr tests are in sub-blocks (342cca35)
 *  opt-out of dependabot, due to conflicts with renovate (70d60289)
-*  update changelog for v2.3.1 (2f487175)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-email (cdaa8f21)
   *  fallback strings for new resources: nodebb.admin-settings-email (3e56c547)
@@ -11847,7 +9915,6 @@
   *  bump sanitize-html from 2.7.0 to 2.7.1 in /install (7b606d2e)
   *  bump webpack from 5.73.0 to 5.74.0 in /install (a9900625)
 * **i18n:**  fallback strings for new resources: nodebb.admin-settings-advanced, nodebb.admin-menu, nodebb.error (17120e03)
-*  update changelog for v2.3.0 (a6f7fff0)
 
 ##### New Features
 
@@ -11868,7 +9935,6 @@
   *  bump ace-builds from 1.7.1 to 1.8.1 in /install (f397d968)
   *  bump ioredis from 5.2.0 to 5.2.2 in /install (067a5110)
 *  have renovate work off of `develop` branch instead (f334e398)
-*  update changelog for v2.2.5 (6c3ebf3b)
 
 ##### New Features
 
@@ -11908,7 +9974,6 @@
   *  bump jquery-ui from 1.13.1 to 1.13.2 in /install (abb19e98)
   *  bump nodebb-theme-persona in /install (9e52b8c6)
   *  bump ioredis from 5.1.0 to 5.2.0 in /install (8c20fdad)
-*  update changelog for v2.2.4 (52f7ed64)
 
 ##### Bug Fixes
 
@@ -11929,7 +9994,6 @@
 * **deps-dev:**
   *  bump @commitlint/cli from 17.0.2 to 17.0.3 in /install (9e44cdad)
   *  bump eslint from 8.18.0 to 8.19.0 in /install (7139ad5f)
-*  update changelog for v2.2.3 (8719a93f)
 
 ##### Bug Fixes
 
@@ -11939,10 +10003,6 @@
 *  #10739, always re-add theme to active plugins, on theme set (8d701ec3)
 
 #### v2.2.3 (2022-07-05)
-
-##### Chores
-
-*  update changelog for v2.2.2 (f59ddc34)
 
 ##### Bug Fixes
 
@@ -11960,7 +10020,6 @@
 * **deps-dev:**
   *  bump eslint from 8.17.0 to 8.18.0 in /install (bfd626b0)
   *  bump jsdom from 19.0.0 to 20.0.0 in /install (d037c2c9)
-*  update changelog for v2.2.1 (667780cf)
 
 ##### Bug Fixes
 
@@ -11979,7 +10038,6 @@
   *  fallback strings for new resources: nodebb.admin-settings-uploads (da481163)
   *  fallback strings for new resources: nodebb.admin-settings-advanced (34d75e96)
 *  add in warning in language directories about not editing files directly (06074e8c)
-*  update changelog for v2.2.0 (bb3766df)
 
 ##### Documentation Changes
 
@@ -12012,7 +10070,6 @@
 *  bump persona, #10699 (c7fa73b1)
 *  bump vanilla (d90fc18b)
 *  bump persona, closes #10566 (5bc972df)
-*  update changelog for v2.1.1 (ca038b84)
 * **deps:**
   *  bump less from 4.1.2 to 4.1.3 in /install (#10685) (78322636)
   *  bump nodebb-plugin-2factor from 5.0.0 to 5.0.1 in /install (#10686) (701d8d76)
@@ -12054,7 +10111,6 @@
 * **deps-dev:**
   *  bump @commitlint/config-angular in /install (e5e788d2)
   *  bump eslint from 8.16.0 to 8.17.0 in /install (52c86dba)
-*  update changelog for v2.1.0 (7121949d)
 
 ##### Documentation Changes
 
@@ -12072,13 +10128,10 @@
 
 ##### Chores
 
-*  update changelog for v2.1.0 (7121949d)
 *  bump persona (91f32487)
-*  update changelog for v2.0.1 (abd8e216)
 *  remove optional `middleware` parameter from setupPageRoute and setupAdminPageRoute calls (54ff768f)
 *  add note re: sort module (5aca106b)
 *  up emoji (265a0139)
-*  update changelog for v2.0.0 (60fc3f5d)
 * **deps:**
   *  bump nodebb-plugin-2factor from 4.0.1 to 5.0.0 in /install (6e95e5c5)
   *  update dependency lint-staged to v12.5.0 (01f607a5)
@@ -12186,7 +10239,6 @@
 
 ##### Chores
 
-*  update changelog for v1.19.7 (a764df52)
 * **deps:**
   *  update dependency mocha to v10 (a7986773)
   *  bump nodebb-plugin-dbsearch from 5.1.3 to 5.1.4 in /install (#10545) (a2e263a1)
@@ -12231,7 +10283,6 @@
 
 ##### Chores
 
-*  update changelog for v1.19.6 (acca7811)
 * **deps:**
   *  update commitlint monorepo to v16.2.4 (0d9179f7)
   *  update dependency lint-staged to v12.4.1 (#10527) (804542e4)
@@ -12277,7 +10328,6 @@
 
 ##### Chores
 
-*  update changelog for v1.19.5 (05032ca2)
 * **deps:**
   *  bump semver from 7.3.6 to 7.3.7 in /install (#10493) (65cec8d0)
   *  update dependency grunt to v1.5.2 (9f496659)
@@ -12359,7 +10409,6 @@
 
 ##### Chores
 
-*  update changelog for v1.19.4 (0e6e49b2)
 * **deps:**
   *  bump less from 3.13.1 to 4.1.2 in /install (#9856) (d33485f6)
   *  bump autoprefixer from 10.4.2 to 10.4.4 in /install (#10403) (90094935)
@@ -12413,7 +10462,6 @@
 
 *  delay `filter:email.send` removal to v2.0.0 (83fd4311)
 *  up persona (c23b2089)
-*  update changelog for v1.19.3 (0b48ec54)
 * **deps:**
   *  bump postcss from 8.4.7 to 8.4.8 in /install (#10372) (d7a4ae1f)
   *  update dependency lint-staged to v12.3.5 (517ae926)
@@ -12510,7 +10558,6 @@
   *  update commitlint monorepo to v16.2.1 (2290cee5)
   *  update dependency eslint to v8.9.0 (763cd193)
 *  remove punycode dep (e9cb1452)
-*  update changelog for v1.19.2 (f012984d)
 
 ##### New Features
 
@@ -12585,7 +10632,6 @@
 *  up persona (f29bed27)
 *  up packages (b4a4e60e)
 *  up persona (3e30b6cd)
-*  update changelog for v1.19.1 (55df683a)
 * **deps:**
   *  bump ioredis from 4.28.4 to 4.28.5 in /install (#10254) (b496ad44)
   *  bump nodebb-widget-essentials in /install (#10219) (b71025ce)
@@ -12729,7 +10775,6 @@
 *  add test.sh to gitignore (d7796f0b)
 *  delete test script (250274c7)
 *  remove unused lang key #10180 (2fe91e36)
-*  update changelog for v1.19.0 (c8f1bc53)
 * **i18n:**
   *  fallback strings for new resources: nodebb.admin-settings-user (78cd6de7)
   *  fallback strings for new resources: nodebb.user (3ec9197c)
@@ -12823,7 +10868,6 @@
 *  right dropdown (7aa85882)
 *  right dropdown (a998cc1c)
 *  update readme mongodb version (af5393ec)
-*  update changelog for v1.18.6 (3c8109e2)
 * **deps:**
   *  update commitlint monorepo (56d134c3)
   *  update dependency lint-staged to v12.1.7 (40e7007f)
@@ -13130,7 +11174,6 @@
 *  up mentions (98b98a11)
 *  up mentions (3e4d477e)
 *  fix type.yaml example and summary (591424ce)
-*  update changelog for v1.18.5 (82eda23a)
 *  remove .opacity() mixin as it is supported cross-browser (28efcb59)
 * **deps:**
   *  update dependency eslint-plugin-import to v2.25.3 (45a0895c)
@@ -13237,7 +11280,6 @@
 *  remove .opacity() mixin as it is supported cross-browser (28efcb59)
 *  up themes (463b2076)
 *  up persona (1438f409)
-*  update changelog for v1.18.4 (7cbcb521)
 * **deps:**
   *  update dependency lint-staged to v11.2.6 (8d4bb8bb)
   *  update dependency lint-staged to v11.2.5 (0728a994)
@@ -13389,7 +11431,6 @@
 ##### Chores
 
 *  up persona (f4e62fb1)
-*  update changelog for v1.18.3 (f066ddb8)
 * **deps:**
   *  update dependency lint-staged to v11.2.0 (840b49b9)
   *  update commitlint monorepo to v13.2.0 (aa370310)
@@ -13464,7 +11505,6 @@
 ##### Chores
 
 * **deps:**  update docker/build-push-action action to v2.7.0 (ee027719)
-*  update changelog for v1.18.2 (27e9282a)
 
 ##### New Features
 
@@ -13538,7 +11578,6 @@
 ##### Chores
 
 * **deps:**  update commitlint monorepo to v13 (87ba768f)
-*  update changelog for v1.18.1 (0713475d)
 
 ##### New Features
 
@@ -13580,7 +11619,6 @@
 ##### Chores
 
 *  found some hooks that don't play well docgen (ae793b4a)
-*  update changelog for v1.18.0 (2fd9c095)
 * **deps:**  update dependency mocha to v9.1.1 (64bac178)
 
 ##### New Features
@@ -13649,7 +11687,6 @@
   *  update dependency eslint to v7.31.0 (f5a53b7f)
   *  update dependency lint-staged to v11.0.1 (02101315)
 *  up markdown/composer-default, fixes: #9708 (b74eefac)
-*  update changelog for v1.17.2 (5c9c0605)
 
 ##### Documentation Changes
 
@@ -13801,7 +11838,6 @@
 *  lint (2b42e7ed)
 *  fix indentation (d07229aa)
 *  up rewards (ca9ca876)
-*  update changelog for v1.17.1 (1e6ed0ad)
 
 ##### Documentation Changes
 
@@ -13912,7 +11948,6 @@
   *  update dependency mocha to v8.4.0 (461e187b)
   *  update dependency eslint to v7.25.0 (32c20806)
   *  update dependency grunt to v1.4.0 (a30deef3)
-*  update changelog for v1.17.0 (4c441a1b)
 
 ##### Documentation Changes
 
@@ -14082,7 +12117,6 @@
 *  fallbacks (74be1a59)
 *  deprecation notices for plugins using plugin old hook methods (3052256d)
 *  add deprecation notice in comments for ajaxify.loadExtraScripts (8b09292e)
-*  update changelog for v1.16.2 (d3883d4b)
 
 ##### Documentation Changes
 
@@ -14625,7 +12659,6 @@
   *  update dependency husky to v4.3.8 (a6f5de86)
   *  update dependency eslint to v7.18.0 (afbef95f)
   *  update dependency husky to v4.3.7 (d3e041e2)
-*  update changelog for v1.16.1 (b6d71710)
 
 ##### New Features
 
@@ -14704,7 +12737,6 @@
 *  increase test timeout (0d7dfeeb)
 *  add deprecation notice to topic thumb tpl value (05d8b3c3)
 *  minor reordering of lines (8e5a413e)
-*  update changelog for v1.16.0 (1437c62f)
 * **deps:**
   *  update dependency eslint to v7.17.0 (18ae7cf7)
   *  update dependency eslint to v7.16.0 (2610dfcf)
@@ -14826,7 +12858,6 @@
   *  update dependency lint-staged to v10.5.3 (3e6f7359)
 *  appease codeclimate (9f62df15)
 *  add comment for clarification (6037f5ee)
-*  update changelog for v1.15.5 (b0299326)
 * **i18n:**  fallbacks for new topic thumb keys (15f1a089)
 
 ##### New Features
@@ -14950,7 +12981,6 @@
 ##### Chores
 
 *  up persona (c111bde1)
-*  update changelog for v1.15.4 (252dddfc)
 
 ##### New Features
 
@@ -14974,7 +13004,6 @@
 *  fallbacks for nodebb.error (82ca3760)
 *  fallbacks for nodebb.topic (5b269bc5)
 *  remove test code (07fe959c)
-*  update changelog for v1.15.3 (cf157c9b)
 
 ##### New Features
 
@@ -15103,7 +13132,6 @@
 *  pin autoprefixer to latest (46eb7701)
 *  up persona (81984285)
 *  up slick (5f2fe883)
-*  update changelog for v1.15.2 (37965d45)
 * **spec:**  replace ugly hack with another hack for optional properties (45a4f136)
 * **deps:**
   *  update dependency lint-staged to v10.5.2 (db205e2e)
@@ -15330,60 +13358,22 @@
 
 ##### Chores
 
-*  update changelog for v1.15.0-rc.5 (69f4d5ac)
 *  add info log into tests (b6d86878)
 *  update renovate config to automatically merge non-major version bumps #yolo (1c8b8ce1)
-*  update changelog for v1.15.0-rc.4 (16882941)
-*  update changelog for v1.15.0-rc.3 (2738041b)
 *  bump persona (e0b67817)
-*  update changelog for v1.15.0-rc.2 (c3a7ab54)
-*  update changelog for v1.15.0-rc.1 (4f49b3da)
-*  update changelog for v1.15.0-rc.0 (aab5f018)
-*  update changelog for v1.15.0-beta.30 (39648722)
 *  some optimizations for codeclimate (4a63c20a)
-*  update changelog for v1.15.0-beta.29 (63696c40)
 *  refactor src/emailer.js (75459517)
-*  update changelog for v1.15.0-beta.28 (fd975a66)
-*  update changelog for v1.15.0-beta.27 (70673824)
 *  lint notifications.js (4fc84e9f)
-*  update changelog for v1.15.0-beta.26 (5e01d288)
 *  up persona (ff8a833a)
 *  up persona (4a0f54ae)
-*  update changelog for v1.15.0-beta.25 (240a04b4)
 *  up persona (032e6001)
-*  update changelog for v1.15.0-beta.24 (72ab5ba1)
 *  up persona (5407bf48)
 *  up persona (4c2eab4b)
 *  up persona (91133b0f)
 *  up persona (bcac0805)
 *  up persona (9dc4db1f)
 *  up persona (ba70a1bf)
-*  update changelog for v1.15.0-beta.23 (e6ea208c)
-*  update changelog for v1.15.0-beta.22 (59ee74c2)
-*  update changelog for v1.15.0-beta.21 (8089542e)
-*  update changelog for v1.15.0-beta.20 (1650f303)
-*  update changelog for v1.15.0-beta.19 (9cde5105)
-*  update changelog for v1.15.0-beta.18 (b2ca9686)
-*  update changelog for v1.15.0-beta.17 (d6178158)
-*  update changelog for v1.15.0-beta.16 (e08297ff)
-*  update changelog for v1.15.0-beta.15 (f878b92c)
-*  update changelog for v1.15.0-beta.14 (5e60d092)
 *  update commitlint config (61a8c6f0)
-*  update changelog for v1.15.0-beta.13 (ca8d492b)
-*  update changelog for v1.15.0-beta.12 (0a242605)
-*  update changelog for v1.15.0-beta.11 (f07ba866)
-*  update changelog for v1.15.0-beta.10 (9c34eced)
-*  update changelog for v1.15.0-beta.9 (affc7927)
-*  update changelog for v1.15.0-beta.8 (3b960c3b)
-*  update changelog for v1.15.0-beta.7 (e449ff9a)
-*  update changelog for v1.15.0-beta.6 (a7f03b64)
-*  update changelog for v1.15.0-beta.5 (0e90064e)
-*  update changelog for v1.15.0-beta.4 (6c4aed8c)
-*  update changelog for v1.15.0-beta.3 (11e2ccab)
-*  update changelog for v1.15.0-beta.2 (d8a9f1c3)
-*  update changelog for v1.15.0-beta.1 (aeca19d5)
-*  update changelog for v1.14.2 (cd94c24a)
-*  update changelog for v1.14.2 (488e69fd)
 * **deps:**
   *  update dependency mocha to v8.2.1 (35e725d1)
   *  update dependency lint-staged to v10.5.1 (2fa78e43)
@@ -16165,11 +14155,9 @@
 
 ##### Chores
 
-*  update changelog for v1.14.2 (488e69fd)
 *  up theme (63fb2ad7)
 *  up theme (15aabfd3)
 *  up theme (599c5015)
-*  update changelog for v1.14.1 (d4c16086)
 * **deps:**  update commitlint monorepo to v9.1.1 (0ca7e28a)
 
 ##### New Features
@@ -16200,17 +14188,10 @@
 
 ##### Other Changes
 
-*  update changelog for v1.14.2" (e085c846)
 * flag.showModal on flag modal appearance (3379d65f)
 * NodeBB/NodeBB (2fba0a14)
-*  update changelog for v1.14.1" (26c74409)
 
 #### 1.14.1 (2020-07-08)
-
-##### Chores
-
-*  update changelog for v1.14.1 (d4c16086)
-*  update changelog for v1.14.0 (cffae0f1)
 
 ##### New Features
 
@@ -16257,7 +14238,6 @@
 
 ##### Other Changes
 
-*  update changelog for v1.14.1" (26c74409)
 * //github.com/NodeBB/NodeBB (0d9461b1)
 * //github.com/NodeBB/NodeBB (ace312e0)
 * post.changeOwner (b60e1cbf)
@@ -16270,7 +14250,6 @@
 
 ##### Chores
 
-*  update changelog for v1.14.0 (cffae0f1)
 *  bump persona (19f9af94)
 *  latest translations and fallbacks (22879633)
 *  bump persona (d2bd746c)
@@ -18580,4 +16559,3 @@
 * **eslint:**
   *  newlines in public/src as well (f7bd398e)
   *  enforcing newline on chained calls (95cc27f1)
-
