@@ -7,6 +7,7 @@ services:
     volumes:
       - nodebb-build:/usr/src/app/build
       - nodebb-uploads:/usr/src/app/public/uploads
+      - nodebb-config-data:/opt/config
     environment:
       NODEBB_URL: ${NODEBB_URL}
       NODEBB_SECRET: ${NODEBB_SECRET}
@@ -28,3 +29,4 @@ services:
 volumes:
   nodebb-build:
   nodebb-uploads:
+  nodebb-config-data:
