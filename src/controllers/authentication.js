@@ -21,6 +21,13 @@ const sockets = require('../socket.io');
 const authenticationController = module.exports;
 
 async function registerAndLoginUser(req, res, userData) {
+	// Never trust a client-supplied uid; only the session's own uid is valid
+	if (req.uid) {
+		userData.uid = req.uid;
+	} else {
+		delete userData.uid;
+	}
+
 	if (!userData.hasOwnProperty('email')) {
 		userData.updateEmail = true;
 	}
@@ -209,13 +216,11 @@ authenticationController.registerAbort = async (req, res) => {
 
 		const { interstitials } = await user.interstitials.get(req, req.session.registration);
 		if (!interstitials.length) {
-			winston.info(`[register/abort] no intersitials ${JSON.stringify({ uid: req.uid, session: req.session })}`);
 			delete req.session.registration;
 			return res.redirect(nconf.get('relative_path') + (req.session.returnTo || '/'));
 		}
-		winston.info(`[register/abort] Found intersitials ${JSON.stringify({ uid: req.uid, session: req.session, interstitials })}`);
 	}
-	winston.info(`[register/abort] clearing session ${JSON.stringify({ uid: req.uid, session: req.session })}`);
+
 	// End the session and redirect to home
 	req.session.destroy(() => {
 		res.clearCookie(nconf.get('sessionKey'), meta.configs.cookie.get());
@@ -249,11 +254,8 @@ authenticationController.login = async (req, res, next) => {
 		const isUsernameLogin = loginWith.includes('username') && !validator.isEmail(req.body.username);
 		if (isEmailLogin) {
 			const username = await user.getUsernameByEmail(req.body.username);
-			if (username !== '[[global:guest]]') {
-				req.body.username = username;
-			} else {
-				return errorHandler(req, res, '[[error:invalid-email]]', 400);
-			}
+			// if no username, pass in dummy username for login purposes, otherwise oracle 🔮 if returning early here
+			req.body.username = (username && username !== '[[global:guest]]') ? username : '__dummy__';
 		}
 		if (isEmailLogin || isUsernameLogin) {
 			continueLogin(strategy, req, res, next);
@@ -303,8 +305,6 @@ function continueLogin(strategy, req, res, next) {
 			const code = await user.reset.generate(userData.uid);
 			(res.locals.redirectAfterLogin || redirectAfterLogin)(req, res, `${nconf.get('relative_path')}/reset/${code}`);
 		} else {
-			delete req.query.lang;
-
 			await authenticationController.doLogin(req, userData.uid);
 			let destination;
 			if (req.session.returnTo) {
@@ -416,29 +416,29 @@ const destroyAsync = util.promisify((req, callback) => req.session.destroy(callb
 const logoutAsync = util.promisify((req, callback) => req.logout(callback));
 
 authenticationController.localLogin = async function (req, username, password, next) {
-	if (!username) {
-		return next(new Error('[[error:invalid-username]]'));
-	}
-
-	if (!password || !utils.isPasswordValid(password)) {
-		return next(new Error('[[error:invalid-password]]'));
-	}
-
-	if (password.length > 512) {
-		return next(new Error('[[error:password-too-long]]'));
-	}
-
-	const userslug = slugify(username);
-	if (!utils.isUserNameValid(username) || !userslug) {
-		return next(new Error('[[error:invalid-username]]'));
-	}
-
-	const uid = await user.getUidByUserslug(userslug);
-	if (!parseInt(uid, 10) && await user.isRegistrationPending(username, password, req.ip)) {
-		throw new Error('[[error:registration-pending]]');
-	}
-
 	try {
+		if (!username) {
+			throw new Error('[[error:invalid-username]]');
+		}
+
+		if (!password || !utils.isPasswordValid(password)) {
+			throw new Error('[[error:invalid-password]]');
+		}
+
+		if (password.length > 512) {
+			throw new Error('[[error:password-too-long]]');
+		}
+
+		const userslug = slugify(username);
+		if (!utils.isUserNameValid(username) || !userslug) {
+			throw new Error('[[error:invalid-username]]');
+		}
+
+		const uid = await user.getUidByUserslug(userslug);
+		if (!parseInt(uid, 10) && await user.isRegistrationPending(username, password, req.ip)) {
+			throw new Error('[[error:registration-pending]]');
+		}
+
 		const [userData, isAdminOrGlobalMod, canLoginIfBanned] = await Promise.all([
 			user.getUserFields(uid, ['uid', 'passwordExpiry']),
 			user.isAdminOrGlobalMod(uid),

@@ -64,6 +64,12 @@ describe('Controllers', () => {
 		assert(body.csrf_token);
 	});
 
+	it('should load route json data via /API/recent', async () => {
+		const { response, body } = await request.get(`${nconf.get('url')}/API/recent`);
+		assert.equal(response.statusCode, 200);
+		assert.strictEqual(body.template.name, 'recent');
+	});
+
 	it('should expose notification settings used by client-side subscription hints', async () => {
 		await Promise.all([
 			user.setSetting(fooUid, 'notificationType_new-reply', 'none'),
@@ -461,6 +467,31 @@ describe('Controllers', () => {
 				const userData = await user.getUserData(uid);
 				assert.strictEqual(userData.email, '');
 				assert.strictEqual(userData['email:confirmed'], 0);
+
+				meta.config.requireEmailAddress = 1;
+			});
+
+			it('should not remove the email of a user other than the caller', async () => {
+				meta.config.requireEmailAddress = 0;
+
+				// Passwordless account with a confirmed email (e.g. SSO-created)
+				const uid = await user.create({
+					username: 'interstiuser-guest-uid', email: 'interstiuser-guest-uid@nodebb.org',
+				}, { emailVerification: 'verify' });
+
+				const result = await user.interstitials.email({
+					userData: { uid: uid, updateEmail: true },
+					req: { uid: 0, session: { id: 0 } },
+					interstitials: [],
+				});
+
+				await assert.rejects(result.interstitials[0].callback({ uid }, {
+					email: '',
+				}), { message: '[[error:no-privileges]]' });
+
+				const userData = await user.getUserData(uid);
+				assert.strictEqual(userData.email, 'interstiuser-guest-uid@nodebb.org');
+				assert.strictEqual(userData['email:confirmed'], 1);
 
 				meta.config.requireEmailAddress = 1;
 			});
@@ -1831,6 +1862,12 @@ describe('Controllers', () => {
 			result = await request.get(`${nconf.get('url')}/api/category/${category.slug}`, { jar });
 			assert.equal(result.response.headers['x-redirect'], encodeURIComponent('/recent'));
 			assert.equal(result.body, '/recent');
+		});
+
+		it('should redirect to home if link is unsafe', async () => {
+			const result = await request.get(`${nconf.get('url')}/api/ap?resource=javascript:alert(origin)`, { jar });
+			assert.equal(result.response.headers['x-redirect'], encodeURIComponent(`${nconf.get('relative_path')}/`));
+			assert.equal(result.body.external, `${nconf.get('relative_path')}/`);
 		});
 
 		it('should get recent topic replies from children categories', async () => {

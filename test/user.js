@@ -443,6 +443,24 @@ describe('User', () => {
 			assert.equal(uid, data.users[0].uid);
 		});
 
+		it('should not match hidden full names for unprivileged users', async () => {
+			const uid = await User.create({ username: 'fullnamesearch3', fullname: 'Hidden Realname' });
+			let data = await apiUser.search({ uid: testUid }, { query: 'hidden realname', searchBy: 'fullname' });
+			assert.equal(data.users.length, 0);
+
+			data = await apiUser.search({ uid: adminUid }, { query: 'hidden realname', searchBy: 'fullname' });
+			assert.equal(data.users.length, 1);
+			assert.equal(uid, data.users[0].uid);
+
+			const { hideFullname } = meta.config;
+			meta.config.hideFullname = 0;
+			await User.setSetting(uid, 'showfullname', 1);
+			data = await apiUser.search({ uid: testUid }, { query: 'hidden realname', searchBy: 'fullname' });
+			meta.config.hideFullname = hideFullname;
+			assert.equal(data.users.length, 1);
+			assert.equal(uid, data.users[0].uid);
+		});
+
 		it('should return empty array if query is empty', async () => {
 			const data = await apiUser.search({ uid: testUid }, { query: '' });
 			assert.equal(data.users.length, 0);
@@ -545,6 +563,41 @@ describe('User', () => {
 			await messaging.leaveRoom([uid2], roomId);
 			await User.delete(1, uid1);
 			assert.strictEqual(await User.exists(uid1), false);
+		});
+
+		it('should properly update global post counters after user account deletion with a topic that has replies from other users', async () => {
+			const global = await db.getObject('global');
+
+			const uid1 = await User.create({ username: 'chatuserdelete1' });
+			const uid2 = await User.create({ username: 'chatuserdelete2' });
+			const uid3 = await User.create({ username: 'chatuserdelete3' });
+			const topic = await Topics.post({
+				uid: uid1,
+				title: 'topic with replies',
+				content: 'initial post content',
+				cid: testCid,
+			});
+
+			await Topics.reply({
+				uid: uid2,
+				tid: topic.topicData.tid,
+				content: 'reply content',
+			});
+			await Topics.reply({
+				uid: uid3,
+				tid: topic.topicData.tid,
+				content: 'reply content 2',
+			});
+			const afterPosting = await db.getObject('global');
+			assert.strictEqual(Number(afterPosting.postCount), Number(global.postCount) + 3); // initial post + 2 replies
+			assert.strictEqual(Number(afterPosting.topicCount), Number(global.topicCount) + 1); // just one new topic
+
+			await User.deleteContent(uid1, uid1);
+
+			const afterUserDelete = await db.getObject('global');
+
+			assert.strictEqual(Number(afterUserDelete.postCount), Number(global.postCount)); // back to original postcount
+			assert.strictEqual(Number(afterUserDelete.topicCount), Number(global.topicCount)); // back to original topic count
 		});
 	});
 

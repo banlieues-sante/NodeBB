@@ -38,6 +38,7 @@ const als = require('./als');
 const app = express();
 
 app.renderAsync = async (tpl, data) => {
+	let renderData = data;
 	if (!Object.hasOwn(data, '_i18n')) {
 		const store = als.getStore();
 		if (!store) {
@@ -46,10 +47,13 @@ app.renderAsync = async (tpl, data) => {
 		}
 		const uid = store?.uid || 0;
 		const { userLang, acpLang } = await user.getSettings(uid);
-		data._i18n = languages.getFull(tpl.startsWith('admin/') ? acpLang : userLang);
+		renderData = {
+			...renderData,
+			_i18n: languages.getFull(tpl.startsWith('admin/') ? acpLang : userLang),
+		};
 	}
 	return new Promise((resolve, reject) => {
-		app.render(tpl, data, (err, html) => {
+		app.render(tpl, renderData, (err, html) => {
 			if (err) return reject(err);
 			resolve(html);
 		});
@@ -319,9 +323,12 @@ async function listen() {
 		winston.warn("[startup] 'trust_proxy' is not configured, so Express proxy trust is disabled by default. Set 'trust_proxy' in config.json only when NodeBB is behind a reverse proxy that strips or overwrites X-Forwarded-For from untrusted clients.");
 	}
 	if (trust_proxy != null) {
-		const trustProxyPrefix = trust_proxy ? '🤝' : '❌';
+		const setValue = ['true', 'false'].includes(trust_proxy) ?
+			trust_proxy === 'true' :
+			trust_proxy;
+		const trustProxyPrefix = setValue ? '🤝' : '❌';
 		winston.info(`${trustProxyPrefix} Setting 'trust proxy' to ${JSON.stringify(trust_proxy)}`);
-		app.set('trust proxy', trust_proxy);
+		app.set('trust proxy', setValue);
 	}
 
 	if ((port === 80 || port === 443) && process.env.NODE_ENV !== 'development') {
