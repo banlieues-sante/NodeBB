@@ -1,3 +1,141 @@
+#### v4.16.8 (2026-11-12)
+
+##### Chores
+
+*  incrementing version number - v4.16.8 (f7ee36d6)
+*  update changelog for v4.16.7 (da90487d)
+
+##### New Features
+
+*  closes #15115, allow modifiying email verification type (c2451a48)
+
+##### Bug Fixes
+
+*  show the edited indicator on grouped chat messages (#15106) (b04f482e)
+*  decode all HTML entities in ACP page title (#15109) (670e80d3)
+*  case sensitive path regexes, add missing tests (7c909367)
+*  hide custom user fields in user data on /api/user/:userslug (39da887d)
+*  on topics' internal method deleteTopics, call topics.purgePostsAndTopic so other users' posts are not orphaned (2f5e2f04)
+*  dont error if app.user or app.user.blocks is undefined (f47b6404)
+*  closes #15082, fix modal event handler (9c1271df)
+* **emailer:**  mask raw email addresses in plugin  cancellation logs to prevent PII leaks (894651cf)
+
+##### Refactors
+
+*  don need to delete req.query.lang (df7eca6e)
+*  don't modify req.query (79373f4f)
+*  use searchQuery (25121d4a)
+*  dont write to req.query (6045e2af)
+*  refactor: use regex for api & admin path so it works in express v4 & v5 (542f47e7)
+*  use regex for api & admin path so it works in express v4 & v5 (fe806595)
+
+##### Tests
+
+*  fix redis tests (04f4c782)
+*  add a test for user.deleteCount and counters (130aadd0)
+
+#### v4.16.7 (2026-10-31)
+
+##### Chores
+
+*  incrementing version number - v4.16.7 (e10be67a)
+*  update changelog for v4.16.6 (2e041957)
+
+##### Bug Fixes
+
+*  xss in chat message restore via translateHtml (760ded45)
+*  add dedicated purge button to chat messages, same patter as posts (cdde44e5)
+
+#### v4.16.6 (2026-10-30)
+
+##### Chores
+
+*  incrementing version number - v4.16.6 (0d9a6e4a)
+*  remove comments (c6685c64)
+*  up filetype (420aacdd)
+*  update changelog for v4.16.5 (be50a2e1)
+
+##### Bug Fixes
+
+*  dont allow redirect to unsafe url via /ap?resource path (373f3f35)
+* **auth:**
+  *  prevent user account enumeration (via email) on login (ce1c358d)
+  *  ignore client-supplied uid in registration flow (376d14ab)
+
+##### Tests
+
+*  on more corepack test (b121082f)
+*  dockerfile change for corepack, its removed in node:lts (db611d0b)
+*  fix relative_path tests (435d7189)
+*  remove .only (8df05a3c)
+
+#### v4.16.5 (2026-10-28)
+
+##### Chores
+
+*  incrementing version number - v4.16.5 (c3d8dc51)
+*  up qs (f27027c7)
+*  up nodemailer and smtp-server (ef387992)
+*  up dbsearch (d2879b41)
+*  up some packages (c0785ad4)
+*  up persona (37cca916)
+*  update changelog for v4.16.4 (7e51e555)
+
+##### Bug Fixes
+
+*  add missing ip-locked lang key, closes #15053 (e00506ca)
+*  closes #15052, allow socket.emits from exempt groups (be7580a7)
+
+##### Refactors
+
+*  add hint to force usage of zset indexes (687e1a5d)
+*  catch all exceptions in localLogin, closes #15054 (ce62dcd5)
+*  don't modify passed in data to renderAsync (897c15ec)
+
+#### v4.16.4 (2026-10-23)
+
+##### Chores
+
+*  incrementing version number - v4.16.4 (38b0bbac)
+*  up dbsearch (820c5fce)
+*  up dbsearch (ba45dd7e)
+*  up harmony (4408f117)
+*  update changelog for v4.16.3 (5aae7e17)
+
+##### New Features
+
+*  add inflight request handling to lru/ttl cache (3b778b9b)
+*  return registration pending message (31f883f9)
+
+##### Bug Fixes
+
+*  another security fix for body-parser (de3e7731)
+*  update multer to address CVE (d7502b92)
+*  crosspost remove bypass via cid type manipulation (1a90f8a4)
+*  closes #15029, apply default user settings set in acp to guests as well (73334d7b)
+*  closes #15023 (b609bd3f)
+*  closes #15022, encode targetId, fixed AP urls (387099dd)
+*  missing return in intents.create (2f74bfa3)
+*  closes #15011, update messageCount on message purge (4e4051fa)
+*  remove extraneous chore lines from changelog (8d2af9ea)
+* **search:**  support federated (UUID) tids in in-topic search (#15043) (1169aff5)
+* **activitypub:**  keep emoji tags when tag is a single object (740511cf)
+
+##### Refactors
+
+*  tags are stored in topic hash (acca7f34)
+*  use promise.all, use req.uid, always set isSelf (dbf9cc66)
+*  single return (80d6a165)
+
+##### Tests
+
+*  remove node 22 (d497a866)
+*  mongodb7.0 (ea09832c)
+*  add healthcheck to mongodb (c8c2b24d)
+*  fix crosspost test (abe2c263)
+*  fix tests again (084dfd27)
+*  fix tests (8d725cb6)
+
 #### v4.16.3 (2026-10-14)
 
 ##### Chores

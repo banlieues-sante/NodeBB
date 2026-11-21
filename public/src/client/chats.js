@@ -424,7 +424,8 @@ define('forum/chats', [
 	Chats.addScrollBottomHandler = function (roomId, chatContent) {
 		chatContent.parents('[component="chat/message/window"]')
 			.find('[component="chat/messages/scroll-up-alert"]')
-			.off('click').on('click', function () {
+			.off('click')
+			.on('click', function () {
 				if (ajaxify.data.scrollToIndex && parseInt(ajaxify.data.roomId, 10) === parseInt(roomId, 10)) {
 					Chats.switchChat(roomId);
 				} else {
@@ -498,6 +499,9 @@ define('forum/chats', [
 					break;
 				case 'restore':
 					messages.restore(messageId, roomId);
+					break;
+				case 'purge':
+					messages.purge(messageId, roomId);
 					break;
 				case 'pin':
 					pinnedMessages.pin(messageId, roomId);
